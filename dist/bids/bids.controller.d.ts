@@ -1,0 +1,12 @@
+import { BidsService } from './bids.service';
+import { CreateBidDto } from './dto/create-bid.dto';
+import { UpdateBidDto } from './dto/update-bid.dto';
+export declare class BidsController {
+    private readonly bidsService;
+    constructor(bidsService: BidsService);
+    create(createBidDto: CreateBidDto): string;
+    findAll(): string;
+    findOne(id: string): string;
+    update(id: string, updateBidDto: UpdateBidDto): string;
+    remove(id: string): string;
+}
