@@ -30,28 +30,23 @@ let TaskService = class TaskService {
                 promises.push(this.scrapeLatestBids(String(url), city));
             }
             await Promise.all(promises);
-            console.log("End of Execution: ", this.outputData);
         }
         catch (error) {
             console.error('Error executing GPT scraper:', error);
         }
     }
     async scrapeLatestBids(url, city) {
-        console.log("Scraping");
         try {
             const escapedCity = city.replace(/ /g, '\\ ');
-            console.log("Escaped: ", escapedCity);
             (0, child_process_1.exec)(`python /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${city}"`, (error, stdout, stderr) => {
                 if (error) {
                     console.error('Error executing Python script:', error);
                     return;
                 }
-                console.log("Stdout: ", stdout);
                 const jsonStartIndex = stdout.indexOf('[{');
                 const jsonEndIndex = stdout.lastIndexOf('}]');
                 if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
                     const jsonString = stdout.substring(jsonStartIndex, jsonEndIndex + 2);
-                    console.log('JSON String:', jsonString);
                     try {
                         const dataArray = JSON.parse(jsonString);
                         this.outputData.push(dataArray);
