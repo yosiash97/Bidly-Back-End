@@ -30,39 +30,50 @@ let TaskService = class TaskService {
                 promises.push(this.scrapeLatestBids(String(url), city));
             }
             await Promise.all(promises);
+            console.log("Output: ", this.outputData);
         }
         catch (error) {
             console.error('Error executing GPT scraper:', error);
         }
     }
     async scrapeLatestBids(url, city) {
+        console.log("In scrape");
         try {
+            console.log("in try");
             const escapedCity = city.replace(/ /g, '\\ ');
-            (0, child_process_1.exec)(`python /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${city}"`, (error, stdout, stderr) => {
-                if (error) {
-                    console.error('Error executing Python script:', error);
-                    return;
+            console.log("Command -> ", `python /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${escapedCity}"`);
+            const { stdout, stderr } = await this.promisifyExec(`python /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${escapedCity}"`);
+            const jsonStartIndex = stdout.indexOf('[{');
+            const jsonEndIndex = stdout.lastIndexOf('}]');
+            if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
+                const jsonString = stdout.substring(jsonStartIndex, jsonEndIndex + 2);
+                try {
+                    const dataArray = JSON.parse(jsonString);
+                    this.outputData.push(dataArray);
                 }
-                const jsonStartIndex = stdout.indexOf('[{');
-                const jsonEndIndex = stdout.lastIndexOf('}]');
-                if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
-                    const jsonString = stdout.substring(jsonStartIndex, jsonEndIndex + 2);
-                    try {
-                        const dataArray = JSON.parse(jsonString);
-                        this.outputData.push(dataArray);
-                    }
-                    catch (jsonError) {
-                        console.error('Error parsing JSON:', jsonError);
-                    }
+                catch (jsonError) {
+                    console.error('Error parsing JSON:', jsonError);
                 }
-                if (stderr) {
-                    console.error('Python script error:', stderr);
-                }
-            });
+            }
+            if (stderr) {
+                console.error('Python script error:', stderr);
+            }
         }
         catch (error) {
             console.error('Error executing Python script for: ', city, error);
         }
+    }
+    promisifyExec(command) {
+        return new Promise((resolve, reject) => {
+            (0, child_process_1.exec)(command, (error, stdout, stderr) => {
+                if (error) {
+                    reject(error);
+                }
+                else {
+                    resolve({ stdout, stderr });
+                }
+            });
+        });
     }
 };
 exports.TaskService = TaskService;

@@ -6,4 +6,5 @@ export declare class TaskService {
     private readonly outputData;
     executeGptScraper(): Promise<void>;
     private scrapeLatestBids;
+    private promisifyExec;
 }

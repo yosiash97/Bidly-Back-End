@@ -3,9 +3,6 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { exec } from 'child_process';
 import * as fs from 'fs';
 import { HttpService } from '@nestjs/axios';
-import { Observable } from 'rxjs';
-import { toArray } from 'rxjs/operators';
-import { stderr } from 'process';
 
 @Injectable()
 export class TaskService {
@@ -28,6 +25,8 @@ export class TaskService {
       // Wait for all promises to resolve
       await Promise.all(promises);
 
+      console.log("Output: ", this.outputData)
+
       // After all data is collected, you can insert it into the database
       // this.insertIntoDatabase(this.outputData);
     } catch (error) {
@@ -36,35 +35,44 @@ export class TaskService {
   }
 
   private async scrapeLatestBids(url: string, city: string): Promise<void> {
+    console.log("In scrape");
     try {
+      console.log("in try");
       const escapedCity = city.replace(/ /g, '\\ '); 
-      exec(`python /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${city}"`, (error, stdout, stderr) => {
-        if (error) {
-          console.error('Error executing Python script:', error);
-          return;
+      console.log("Command -> ", `python /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${escapedCity}"`);
+      
+      // Execute the Python script using promisified version of exec
+      const { stdout, stderr } = await this.promisifyExec(`python /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${escapedCity}"`);
+      
+      const jsonStartIndex = stdout.indexOf('[{');
+      const jsonEndIndex = stdout.lastIndexOf('}]');
+      if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
+        const jsonString = stdout.substring(jsonStartIndex, jsonEndIndex + 2);
+        try {
+          const dataArray = JSON.parse(jsonString);
+          this.outputData.push(dataArray);
+        } catch (jsonError) {
+          console.error('Error parsing JSON:', jsonError);
         }
-        const jsonStartIndex = stdout.indexOf('[{');
-        const jsonEndIndex = stdout.lastIndexOf('}]');
-        if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
-          const jsonString = stdout.substring(jsonStartIndex, jsonEndIndex + 2);
-          try {
-            const dataArray = JSON.parse(jsonString);
-            this.outputData.push(dataArray);
-          } catch (jsonError) {
-            console.error('Error parsing JSON:', jsonError);
-          }
-        }
-        if (stderr) {
-          console.error('Python script error:', stderr);
-        }
-      });
+      }
+      if (stderr) {
+        console.error('Python script error:', stderr);
+      }
     } catch (error) {
       console.error('Error executing Python script for: ', city, error);
     }
   }
 
-  // Method to insert data into the database
-  // private insertIntoDatabase(data: any[]) {
-  //   // Insert data into the database
-  // }
+  // Promisify the exec function
+  private promisifyExec(command: string): Promise<{ stdout: string, stderr: string }> {
+    return new Promise((resolve, reject) => {
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve({ stdout, stderr });
+        }
+      });
+    });
+  }
 }
