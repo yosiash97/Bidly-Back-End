@@ -3,10 +3,14 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { exec } from 'child_process';
 import * as fs from 'fs';
 import { HttpService } from '@nestjs/axios';
+import { BidsService } from 'src/bids/bids.service';
 
 @Injectable()
 export class TaskService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly bidsService: BidsService
+    ) {}
   private readonly jsonFilePath = "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
   private readonly outputData: any[] = [];
 
@@ -24,13 +28,22 @@ export class TaskService {
 
       // Wait for all promises to resolve
       await Promise.all(promises);
-
+      
+      await this.loadScrapedBidsIntoDB();
       console.log("Output: ", this.outputData)
 
       // After all data is collected, you can insert it into the database
       // this.insertIntoDatabase(this.outputData);
     } catch (error) {
       console.error('Error executing GPT scraper:', error);
+    }
+  }
+
+  private async loadScrapedBidsIntoDB() {
+    for (let bid of this.outputData ) {
+      console.log("Bid -> ", bid)
+      console.log("about to create...")
+      await this.bidsService.create(bid)
     }
   }
 
