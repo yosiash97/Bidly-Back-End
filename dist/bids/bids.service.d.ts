@@ -1,7 +1,15 @@
 import { CreateBidDto } from './dto/create-bid.dto';
 import { UpdateBidDto } from './dto/update-bid.dto';
+import { PrismaService } from 'src/prisma.service';
 export declare class BidsService {
-    create(createBidDto: CreateBidDto): string;
+    private prisma;
+    constructor(prisma: PrismaService);
+    create(createBidDto: CreateBidDto): Promise<{
+        id: number;
+        title: string;
+        status: string;
+        url: string;
+    }>;
     findAll(): string;
     findOne(id: number): string;
     update(id: number, updateBidDto: UpdateBidDto): string;

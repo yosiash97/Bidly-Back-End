@@ -15,9 +15,11 @@ const schedule_1 = require("@nestjs/schedule");
 const child_process_1 = require("child_process");
 const fs = require("fs");
 const axios_1 = require("@nestjs/axios");
+const bids_service_1 = require("../bids/bids.service");
 let TaskService = class TaskService {
-    constructor(httpService) {
+    constructor(httpService, bidsService) {
         this.httpService = httpService;
+        this.bidsService = bidsService;
         this.jsonFilePath = "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
         this.outputData = [];
     }
@@ -30,10 +32,18 @@ let TaskService = class TaskService {
                 promises.push(this.scrapeLatestBids(String(url), city));
             }
             await Promise.all(promises);
+            await this.loadScrapedBidsIntoDB();
             console.log("Output: ", this.outputData);
         }
         catch (error) {
             console.error('Error executing GPT scraper:', error);
+        }
+    }
+    async loadScrapedBidsIntoDB() {
+        for (let bid of this.outputData) {
+            console.log("Bid -> ", bid);
+            console.log("about to create...");
+            await this.bidsService.create(bid);
         }
     }
     async scrapeLatestBids(url, city) {
@@ -85,6 +95,7 @@ __decorate([
 ], TaskService.prototype, "executeGptScraper", null);
 exports.TaskService = TaskService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [axios_1.HttpService])
+    __metadata("design:paramtypes", [axios_1.HttpService,
+        bids_service_1.BidsService])
 ], TaskService);
 //# sourceMappingURL=task.service.js.map

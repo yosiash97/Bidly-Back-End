@@ -10,13 +10,14 @@ exports.BidsModule = void 0;
 const common_1 = require("@nestjs/common");
 const bids_service_1 = require("./bids.service");
 const bids_controller_1 = require("./bids.controller");
+const prisma_service_1 = require("../prisma.service");
 let BidsModule = class BidsModule {
 };
 exports.BidsModule = BidsModule;
 exports.BidsModule = BidsModule = __decorate([
     (0, common_1.Module)({
         controllers: [bids_controller_1.BidsController],
-        providers: [bids_service_1.BidsService],
+        providers: [bids_service_1.BidsService, prisma_service_1.PrismaService],
     })
 ], BidsModule);
 //# sourceMappingURL=bids.module.js.map

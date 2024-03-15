@@ -4,7 +4,12 @@ import { UpdateBidDto } from './dto/update-bid.dto';
 export declare class BidsController {
     private readonly bidsService;
     constructor(bidsService: BidsService);
-    create(createBidDto: CreateBidDto): string;
+    create(createBidDto: CreateBidDto): Promise<{
+        id: number;
+        title: string;
+        status: string;
+        url: string;
+    }>;
     findAll(): string;
     findOne(id: string): string;
     update(id: string, updateBidDto: UpdateBidDto): string;
