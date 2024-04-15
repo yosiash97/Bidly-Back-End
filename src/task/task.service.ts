@@ -40,22 +40,32 @@ export class TaskService {
   }
 
   private async loadScrapedBidsIntoDB() {
-    for (let bid of this.outputData ) {
-      console.log("Bid -> ", bid)
-      console.log("about to create...")
-      await this.bidsService.create(bid)
+    console.log("This output data: ", this.outputData.length)
+    if (this.outputData.length == 0) {
+      return;
+    }
+    let arrayOfBids = this.outputData[0]
+    for (let bid of arrayOfBids ) {
+      console.log("bid: ", bid['geo_location'])
+      await this.bidsService.create({
+        title: bid.title,
+        url: bid.url, 
+        status: bid.status
+      })
     }
   }
+
+  //From FE we have a coordinate X, Y and want to send request for all geocoordinates between 20 miles
 
   private async scrapeLatestBids(url: string, city: string): Promise<void> {
     console.log("In scrape");
     try {
       console.log("in try");
       const escapedCity = city.replace(/ /g, '\\ '); 
-      console.log("Command -> ", `python /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${escapedCity}"`);
+      console.log("Command -> ", `python3 /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${escapedCity}"`);
       
       // Execute the Python script using promisified version of exec
-      const { stdout, stderr } = await this.promisifyExec(`python /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${escapedCity}"`);
+      const { stdout, stderr } = await this.promisifyExec(`python3 /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${escapedCity}"`);
       
       const jsonStartIndex = stdout.indexOf('[{');
       const jsonEndIndex = stdout.lastIndexOf('}]');
