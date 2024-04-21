@@ -47,10 +47,13 @@ export class TaskService {
     let arrayOfBids = this.outputData[0]
     for (let bid of arrayOfBids ) {
       console.log("bid: ", bid['geo_location'])
+      const point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
+      console.log("point: ", point)
       await this.bidsService.create({
         title: bid.title,
         url: bid.url, 
-        status: bid.status
+        status: bid.status,
+        location: point
       })
     }
   }

@@ -1,12 +1,9 @@
 import { TaskService } from './task.service';
+import { BidsService } from 'src/bids/bids.service';
 export declare class TaskController {
     private readonly taskService;
-    constructor(taskService: TaskService);
+    private readonly bidService;
+    constructor(taskService: TaskService, bidService: BidsService);
     findAll(): Promise<void>;
-    dummy(sliderValue: number): Promise<{
-        id: number;
-        city: string;
-        status: string;
-        name: string;
-    }[]>;
+    dummy(sliderValue: number): Promise<unknown>;
 }

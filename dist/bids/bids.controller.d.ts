@@ -9,8 +9,15 @@ export declare class BidsController {
         title: string;
         status: string;
         url: string;
+        location: string;
     }>;
-    findAll(): string;
+    findAll(): Promise<{
+        id: number;
+        title: string;
+        status: string;
+        url: string;
+        location: string;
+    }[]>;
     findOne(id: string): string;
     update(id: string, updateBidDto: UpdateBidDto): string;
     remove(id: string): string;

@@ -18,4 +18,5 @@ model bid {
   title String  @unique
   status  String?
   url String?
+  location String?
 }

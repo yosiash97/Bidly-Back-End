@@ -15,27 +15,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TaskController = void 0;
 const common_1 = require("@nestjs/common");
 const task_service_1 = require("./task.service");
+const bids_service_1 = require("../bids/bids.service");
 let TaskController = class TaskController {
-    constructor(taskService) {
+    constructor(taskService, bidService) {
         this.taskService = taskService;
+        this.bidService = bidService;
     }
     findAll() {
         return this.taskService.executeGptScraper();
     }
     async dummy(sliderValue) {
-        console.log("Slider value:", sliderValue);
+        let records = await this.bidService.findAll();
+        const homeDistance = `POINT 37.3387 121.8853`;
+        let homeLat = 37.3387;
+        let homeLong = -121.8853;
+        let filtered_records = await this.bidService.findBidsWithinDistance(homeLat, homeLong, sliderValue);
+        console.log("Filtered Records -> ", filtered_records);
         await new Promise(resolve => setTimeout(resolve, 2000));
-        return [
-            { "id": 1, "city": "San Jose", "status": "CLOSED", "name": "San Jose Pedestrian Bridge redesign due to structural issues." },
-            { "id": 2, "city": "Oakland", "status": "OPEN", "name": "Oakland City Center, design bike lane for Middle School students biking to school." },
-            { "id": 3, "city": "Berkeley", "status": "PENDING", "name": "UC Berkeley, redesign Shattuck to allow tram through middle. (35 MPH max speed)." },
-            { "id": 4, "city": "San Luis Obispo", "status": "CLOSED", "name": "San Luis Obispo lane, bridge over river for animals" },
-            { "id": 5, "city": "Contra Costa", "status": "OPEN", "name": "Contra Costa lane highway design." },
-            { "id": 6, "city": "Hayward", "status": 'OPEN', "name": "Hayward lane redesign" },
-            { "id": 7, "city": "South San Francisco", "status": 'OPEN', "name": "South SF lane redesign" },
-        ];
+        return filtered_records;
     }
-    ;
 };
 exports.TaskController = TaskController;
 __decorate([
@@ -53,6 +51,7 @@ __decorate([
 ], TaskController.prototype, "dummy", null);
 exports.TaskController = TaskController = __decorate([
     (0, common_1.Controller)('task'),
-    __metadata("design:paramtypes", [task_service_1.TaskService])
+    __metadata("design:paramtypes", [task_service_1.TaskService,
+        bids_service_1.BidsService])
 ], TaskController);
 //# sourceMappingURL=task.controller.js.map

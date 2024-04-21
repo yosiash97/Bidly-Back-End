@@ -26,7 +26,7 @@ episode_scraper = SchemaScraper(
 try:
     response = episode_scraper(url)
 
-    topics = ["bike", "bicycle", "lane", "pedestrian", "safety", "bridge", "design", "car", "road", "Street", "Traffic", "avenue", "route", "improve", "curb", "park", "safe", "CAR-FREE", "Streets"]
+    topics = ["Banking", "MENTAL", "Proposal", "Prevention", "bike", "bicycle", "lane", "pedestrian", "safety", "bridge", "design", "car", "road", "Street", "Traffic", "avenue", "route", "improve", "curb", "park", "safe", "CAR-FREE", "Streets"]
 
     cleaned_response = []
     for each in response.data:
