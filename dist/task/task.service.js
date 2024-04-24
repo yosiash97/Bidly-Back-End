@@ -46,14 +46,13 @@ let TaskService = class TaskService {
         }
         let arrayOfBids = this.outputData[0];
         for (let bid of arrayOfBids) {
-            console.log("bid: ", bid['geo_location']);
             const point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
-            console.log("point: ", point);
             await this.bidsService.create({
                 title: bid.title,
                 url: bid.url,
                 status: bid.status,
-                location: point
+                location: point,
+                city: bid.city
             });
         }
     }
@@ -99,7 +98,7 @@ let TaskService = class TaskService {
 };
 exports.TaskService = TaskService;
 __decorate([
-    (0, schedule_1.Cron)(schedule_1.CronExpression.EVERY_DAY_AT_MIDNIGHT),
+    (0, schedule_1.Cron)('0 0 * * 0'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)

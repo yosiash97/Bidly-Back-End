@@ -35,6 +35,7 @@ try:
             location = geolocator.geocode(city)
             if location:
                 each['geo_location'] = (location.latitude, location.longitude)
+                each['city'] = city
             cleaned_response.append(each)
     output_json = json.dumps(cleaned_response)
     print(output_json)

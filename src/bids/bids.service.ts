@@ -14,7 +14,8 @@ export class BidsService {
         title: createBidDto['title'],
         url: createBidDto['url'],
         status: createBidDto['status'],
-        location: createBidDto['location']
+        location: createBidDto['location'],
+        city: createBidDto['city']
       }
     })
   }

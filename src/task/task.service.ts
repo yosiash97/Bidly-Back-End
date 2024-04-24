@@ -14,7 +14,7 @@ export class TaskService {
   private readonly jsonFilePath = "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
   private readonly outputData: any[] = [];
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron('0 0 * * 0')
   async executeGptScraper() {
     try {
       const jsonFileContent = fs.readFileSync(this.jsonFilePath, 'utf-8');
@@ -46,14 +46,13 @@ export class TaskService {
     }
     let arrayOfBids = this.outputData[0]
     for (let bid of arrayOfBids ) {
-      console.log("bid: ", bid['geo_location'])
       const point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
-      console.log("point: ", point)
       await this.bidsService.create({
         title: bid.title,
         url: bid.url, 
         status: bid.status,
-        location: point
+        location: point,
+        city: bid.city
       })
     }
   }

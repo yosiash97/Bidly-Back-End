@@ -3,4 +3,5 @@ export class Bid {
     status: string;
     url: string;
     location: string;
+    city: string;
 }

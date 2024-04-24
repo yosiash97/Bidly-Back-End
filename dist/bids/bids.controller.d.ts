@@ -10,6 +10,7 @@ export declare class BidsController {
         status: string;
         url: string;
         location: string;
+        city: string;
     }>;
     findAll(): Promise<{
         id: number;
@@ -17,6 +18,7 @@ export declare class BidsController {
         status: string;
         url: string;
         location: string;
+        city: string;
     }[]>;
     findOne(id: string): string;
     update(id: string, updateBidDto: UpdateBidDto): string;
