@@ -4,4 +4,5 @@ export declare class Bid {
     url: string;
     location: string;
     city: string;
+    bid_type: string;
 }

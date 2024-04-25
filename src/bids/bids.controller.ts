@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { BidsService } from './bids.service';
 import { CreateBidDto } from './dto/create-bid.dto';
 import { UpdateBidDto } from './dto/update-bid.dto';
@@ -18,9 +18,9 @@ export class BidsController {
     return this.bidsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.bidsService.findOne(+id);
+  @Get('type')
+  async find(@Query('sliderValue') sliderValue: number, @Query('bidType') bid_type: string) {
+    return this.bidsService.findBidsbyTypeAndDistance(sliderValue, bid_type);
   }
 
   @Patch(':id')

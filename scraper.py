@@ -26,16 +26,25 @@ episode_scraper = SchemaScraper(
 try:
     response = episode_scraper(url)
 
-    topics = ["Transportation", "Banking", "MENTAL", "Proposal", "Prevention", "bike", "bicycle", "lane", "pedestrian", "safety", "bridge", "design", "car", "road", "Street", "Traffic", "avenue", "route", "improve", "curb", "park", "safe", "CAR-FREE", "Streets"]
-
+    civil_engineering_topics = ['Transportation', 'bike', 'Bike', 'bicycle', 'Bicycle', 'lane', 'Lane', 'Pedestrian', 'pedestrian', 'safety', 'bridge', 'design', 'car', 'road', 'street', 'traffic', 'avenue', 'route', 'CAR-FREE', 'streets']
+    construction_topics = ['roofing', 'inspection', 'repair', 'elevator', 'infrastructure', 'construction']
+    # topics = ["Transportation", "Banking", "MENTAL", "Proposal", "Prevention", "bike", "bicycle", "lane", "pedestrian", "safety", "bridge", "design", "car", "road", "Street", "Traffic", "avenue", "route", "improve", "curb", "park", "safe", "CAR-FREE", "Streets"]
+    
     cleaned_response = []
     for each in response.data:
-        contains_topic = any(topic in each['title'] for topic in topics)
-        if contains_topic:
+        # contains_topic = any(topic in each['title'] for topic in topics)
+        contains_civil_engineering_topics = any(topic in each['title'] for topic in civil_engineering_topics)
+        contains_construction_topics = any(topic in each['title'] for topic in construction_topics)
+
+        if contains_civil_engineering_topics or contains_construction_topics:
             location = geolocator.geocode(city)
             if location:
                 each['geo_location'] = (location.latitude, location.longitude)
                 each['city'] = city
+                if contains_construction_topics:
+                    each['bid_type'] = "construction"
+                else:
+                    each['bid_type'] = "civil_engineering"
             cleaned_response.append(each)
     output_json = json.dumps(cleaned_response)
     print(output_json)

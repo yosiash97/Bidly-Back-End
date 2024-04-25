@@ -52,7 +52,8 @@ let TaskService = class TaskService {
                 url: bid.url,
                 status: bid.status,
                 location: point,
-                city: bid.city
+                city: bid.city,
+                bid_type: bid.bid_type
             });
         }
     }

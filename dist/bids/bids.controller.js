@@ -28,8 +28,8 @@ let BidsController = class BidsController {
     findAll() {
         return this.bidsService.findAll();
     }
-    findOne(id) {
-        return this.bidsService.findOne(+id);
+    async find(sliderValue, bid_type) {
+        return this.bidsService.findBidsbyTypeAndDistance(sliderValue, bid_type);
     }
     update(id, updateBidDto) {
         return this.bidsService.update(+id, updateBidDto);
@@ -53,12 +53,13 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], BidsController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)('type'),
+    __param(0, (0, common_1.Query)('sliderValue')),
+    __param(1, (0, common_1.Query)('bidType')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], BidsController.prototype, "findOne", null);
+    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:returntype", Promise)
+], BidsController.prototype, "find", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),

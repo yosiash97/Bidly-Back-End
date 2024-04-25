@@ -11,6 +11,7 @@ export declare class BidsController {
         url: string;
         location: string;
         city: string;
+        bid_type: string;
     }>;
     findAll(): Promise<{
         id: number;
@@ -19,8 +20,9 @@ export declare class BidsController {
         url: string;
         location: string;
         city: string;
+        bid_type: string;
     }[]>;
-    findOne(id: string): string;
+    find(sliderValue: number, bid_type: string): Promise<void>;
     update(id: string, updateBidDto: UpdateBidDto): string;
     remove(id: string): string;
 }
