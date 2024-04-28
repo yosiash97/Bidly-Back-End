@@ -22,7 +22,7 @@ export declare class BidsController {
         city: string;
         bid_type: string;
     }[]>;
-    find(sliderValue: number, bid_type: string): Promise<void>;
+    find(sliderValue: number, bid_type: string): Promise<unknown>;
     update(id: string, updateBidDto: UpdateBidDto): string;
     remove(id: string): string;
 }

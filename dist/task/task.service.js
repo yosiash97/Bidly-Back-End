@@ -16,10 +16,13 @@ const child_process_1 = require("child_process");
 const fs = require("fs");
 const axios_1 = require("@nestjs/axios");
 const bids_service_1 = require("../bids/bids.service");
+const prisma_service_1 = require("../prisma.service");
+const client_1 = require("@prisma/client");
 let TaskService = class TaskService {
-    constructor(httpService, bidsService) {
+    constructor(httpService, bidsService, prisma) {
         this.httpService = httpService;
         this.bidsService = bidsService;
+        this.prisma = prisma;
         this.jsonFilePath = "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
         this.outputData = [];
     }
@@ -40,21 +43,30 @@ let TaskService = class TaskService {
         }
     }
     async loadScrapedBidsIntoDB() {
-        console.log("This output data: ", this.outputData.length);
         if (this.outputData.length == 0) {
             return;
         }
-        let arrayOfBids = this.outputData[0];
+        let arrayOfBids = await this.outputData;
         for (let bid of arrayOfBids) {
             const point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
-            await this.bidsService.create({
-                title: bid.title,
-                url: bid.url,
-                status: bid.status,
-                location: point,
-                city: bid.city,
-                bid_type: bid.bid_type
-            });
+            try {
+                await this.bidsService.create({
+                    title: bid.title,
+                    url: bid.url,
+                    status: bid.status,
+                    location: point,
+                    city: bid.city,
+                    bid_type: bid.bid_type
+                });
+            }
+            catch (error) {
+                if (error instanceof client_1.Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+                    console.error(`A unique constraint violation occurred for the title: ${bid.title}. This bid already exists in the database.`);
+                }
+                else {
+                    console.error('An unexpected error occurred:', error);
+                }
+            }
         }
     }
     async scrapeLatestBids(url, city) {
@@ -70,7 +82,7 @@ let TaskService = class TaskService {
                 const jsonString = stdout.substring(jsonStartIndex, jsonEndIndex + 2);
                 try {
                     const dataArray = JSON.parse(jsonString);
-                    this.outputData.push(dataArray);
+                    this.outputData.push(...dataArray);
                 }
                 catch (jsonError) {
                     console.error('Error parsing JSON:', jsonError);
@@ -107,6 +119,7 @@ __decorate([
 exports.TaskService = TaskService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [axios_1.HttpService,
-        bids_service_1.BidsService])
+        bids_service_1.BidsService,
+        prisma_service_1.PrismaService])
 ], TaskService);
 //# sourceMappingURL=task.service.js.map

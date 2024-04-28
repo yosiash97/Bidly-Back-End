@@ -4,12 +4,16 @@ import { exec } from 'child_process';
 import * as fs from 'fs';
 import { HttpService } from '@nestjs/axios';
 import { BidsService } from 'src/bids/bids.service';
+import { PrismaService } from 'src/prisma.service';
+import { PrismaClient, Prisma } from '@prisma/client';
+import { bid } from '@prisma/client';
 
 @Injectable()
 export class TaskService {
   constructor(
     private readonly httpService: HttpService,
-    private readonly bidsService: BidsService
+    private readonly bidsService: BidsService,
+    private prisma: PrismaService
     ) {}
   private readonly jsonFilePath = "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
   private readonly outputData: any[] = [];
@@ -40,21 +44,30 @@ export class TaskService {
   }
 
   private async loadScrapedBidsIntoDB() {
-    console.log("This output data: ", this.outputData.length)
     if (this.outputData.length == 0) {
       return;
     }
-    let arrayOfBids = this.outputData[0]
+    let arrayOfBids = await this.outputData
     for (let bid of arrayOfBids ) {
       const point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
-      await this.bidsService.create({
-        title: bid.title,
-        url: bid.url, 
-        status: bid.status,
-        location: point,
-        city: bid.city,
-        bid_type: bid.bid_type
-      })
+
+      try {
+        await this.bidsService.create({
+          title: bid.title,
+          url: bid.url, 
+          status: bid.status,
+          location: point,
+          city: bid.city,
+          bid_type: bid.bid_type
+        })
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+          console.error(`A unique constraint violation occurred for the title: ${bid.title}. This bid already exists in the database.`);
+        } else {
+          console.error('An unexpected error occurred:', error);
+        }
+      }
+
     }
   }
 
@@ -76,7 +89,7 @@ export class TaskService {
         const jsonString = stdout.substring(jsonStartIndex, jsonEndIndex + 2);
         try {
           const dataArray = JSON.parse(jsonString);
-          this.outputData.push(dataArray);
+          this.outputData.push(...dataArray); // Spread dataArray and push individual elements
         } catch (jsonError) {
           console.error('Error parsing JSON:', jsonError);
         }

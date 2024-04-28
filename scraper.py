@@ -19,14 +19,14 @@ episode_scraper = SchemaScraper(
     schema,
     auto_split_length=2000,
     extra_instructions=[
-        "Include any Bid or Request for Propopsal that includes the words, Bike, Lane, Pedestrian, Safety, Road",
+        "Include any Bid or Request for Propopsal that has to do with Civil Engineering or Construction",
     ],
 )
 
 try:
     response = episode_scraper(url)
 
-    civil_engineering_topics = ['Transportation', 'bike', 'Bike', 'bicycle', 'Bicycle', 'lane', 'Lane', 'Pedestrian', 'pedestrian', 'safety', 'bridge', 'design', 'car', 'road', 'street', 'traffic', 'avenue', 'route', 'CAR-FREE', 'streets']
+    civil_engineering_topics = ['Cannabis', 'Coding', 'Recycled','Transportation', 'bike', 'Bike', 'bicycle', 'Bicycle', 'lane', 'Sidewalk', 'Lane', 'Pedestrian', 'pedestrian', 'safety', 'bridge', 'design', 'car', 'road', 'street', 'traffic', 'avenue', 'route', 'CAR-FREE', 'streets']
     construction_topics = ['roofing', 'inspection', 'repair', 'elevator', 'infrastructure', 'construction']
     # topics = ["Transportation", "Banking", "MENTAL", "Proposal", "Prevention", "bike", "bicycle", "lane", "pedestrian", "safety", "bridge", "design", "car", "road", "Street", "Traffic", "avenue", "route", "improve", "curb", "park", "safe", "CAR-FREE", "Streets"]
     

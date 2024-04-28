@@ -23,7 +23,7 @@ export declare class BidsService {
         bid_type: string;
     }[]>;
     findBidsWithinDistance(homeLat: number, homeLong: number, sliderValue: number): Promise<unknown>;
-    findBidsbyTypeAndDistance(sliderValue: number, bid_type: string): Promise<void>;
+    findBidsbyTypeAndDistance(sliderValue: number, bid_type: string): Promise<unknown>;
     findOne(id: number): string;
     update(id: number, updateBidDto: UpdateBidDto): string;
     remove(id: number): string;

@@ -62,6 +62,7 @@ let BidsService = class BidsService {
       ) <= ${radiusInMeters}
       AND bid_type = ${bid_type};
     `;
+        return locations;
     }
     findOne(id) {
         console.log("in find one");
