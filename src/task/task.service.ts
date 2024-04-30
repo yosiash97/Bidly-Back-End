@@ -18,7 +18,7 @@ export class TaskService {
   private readonly jsonFilePath = "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
   private readonly outputData: any[] = [];
 
-  @Cron('0 0 * * 0')
+  @Cron(new Date(Date.now() + 5 * 60 * 1000))
   async executeGptScraper() {
     try {
       const jsonFileContent = fs.readFileSync(this.jsonFilePath, 'utf-8');
