@@ -15,7 +15,9 @@ export class TaskService {
     private readonly bidsService: BidsService,
     private prisma: PrismaService
     ) {}
-  private readonly jsonFilePath = "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
+  private readonly jsonFilePath = process.env.NODE_ENV === 'production'
+  ? "cities.json"
+  : "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
   private readonly outputData: any[] = [];
 
   @Cron(new Date(Date.now() + 5 * 60 * 1000))
