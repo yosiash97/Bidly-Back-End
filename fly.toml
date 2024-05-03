@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for bidly-backend-twilight-darkness-9532 on 2024-05-01T19:21:35-04:00
+# fly.toml app configuration file generated for bidly-backend-fragrant-feather-3388 on 2024-05-03T16:16:38-04:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'bidly-backend-twilight-darkness-9532'
+app = 'bidly-backend-fragrant-feather-3388'
 primary_region = 'iad'
 
 [build]
