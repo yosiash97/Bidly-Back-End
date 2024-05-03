@@ -8,7 +8,7 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   });
-  const PORT = 3001;
+  const PORT = 3000;
   const HOST = '0.0.0.0';
   await app.listen(PORT, HOST);
 }
