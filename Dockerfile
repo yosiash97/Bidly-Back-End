@@ -4,6 +4,9 @@
 ARG NODE_VERSION=21.6.2
 FROM node:${NODE_VERSION}-slim as base
 
+ARG POSTGIS_MAJOR=3
+ARG PG_MAJOR=13
+
 LABEL fly_launch_runtime="NestJS/Prisma"
 
 # NestJS/Prisma app lives here
@@ -17,6 +20,9 @@ ENV NODE_ENV="production"
 FROM base as build
 
 RUN apt-get update
+RUN apt-get update \
+    && apt-get install -y postgresql-server-dev-all \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get install --no-install-recommends -y \
     python3 \
