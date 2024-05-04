@@ -24,9 +24,7 @@ RUN apt-get update \
                           postgis \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install --no-install-recommends -y \
-    python3 \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y python3 python3-pip
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
