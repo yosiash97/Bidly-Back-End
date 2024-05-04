@@ -92,14 +92,18 @@ export class TaskService {
         try {
           const dataArray = JSON.parse(jsonString);
           this.outputData.push(...dataArray); // Spread dataArray and push individual elements
+          console.log("in try: ", dataArray)
         } catch (jsonError) {
+          console.log("Json error: ")
           console.error('Error parsing JSON:', jsonError);
         }
       }
       if (stderr) {
+        console.log("in stderr if")
         console.error('Python script error:', stderr);
       }
     } catch (error) {
+      console.log("in catch error")
       console.error('Error executing Python script for: ', city, error);
     }
   }
