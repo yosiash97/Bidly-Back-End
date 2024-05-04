@@ -31,16 +31,16 @@ export class BidsService {
     console.log( 'point', point);
 
     const locations = await this.prisma.$queryRaw`
-      SELECT *, public.ST_DistanceSphere(
-        public.ST_SetSRID(public.ST_MakePoint(${homeLong}, ${homeLat}), 4326),
-        public.ST_SetSRID(public.ST_Point(ST_Y(location::geometry), public.ST_X(location::geometry)), 4326)
-      ) AS distance_in_meters
-      FROM public.bid
-      WHERE public.ST_DistanceSphere(
-        public.ST_SetSRID(public.ST_MakePoint(${homeLong}, ${homeLat}), 4326),
-        public.ST_SetSRID(public.ST_Point(public.ST_Y(location::geometry), public.ST_X(location::geometry)), 4326)
-      ) <= ${radiusInMeters};
-    `;
+    SELECT *, public.ST_DistanceSphere(
+      public.ST_SetSRID(public.ST_MakePoint(${homeLong}, ${homeLat}), 4326),
+      public.ST_SetSRID(public.ST_Point(public.ST_Y(ST_AsText(location::geometry)), public.ST_X(ST_AsText(location::geometry))), 4326)
+    ) AS distance_in_meters
+    FROM public.bid
+    WHERE public.ST_DistanceSphere(
+      public.ST_SetSRID(public.ST_MakePoint(${homeLong}, ${homeLat}), 4326),
+      public.ST_SetSRID(public.ST_Point(public.ST_Y(ST_AsText(location::geometry)), public.ST_X(ST_AsText(location::geometry))), 4326)
+    ) <= ${radiusInMeters};
+  `;
   
     return locations;
   }
