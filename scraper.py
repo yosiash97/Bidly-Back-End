@@ -26,8 +26,8 @@ episode_scraper = SchemaScraper(
 try:
     response = episode_scraper(url)
 
-    civil_engineering_topics = ['Cannabis', 'Coding', 'Recycled','Transportation', 'bike', 'Bike', 'bicycle', 'Bicycle', 'lane', 'Sidewalk', 'Lane', 'Pedestrian', 'pedestrian', 'safety', 'bridge', 'design', 'car', 'road', 'street', 'traffic', 'avenue', 'route', 'CAR-FREE', 'streets']
-    construction_topics = ['roofing', 'inspection', 'repair', 'elevator', 'infrastructure', 'construction']
+    civil_engineering_topics = ['Affordable', 'Street', 'Cannabis', 'Coding', 'Recycled','Transportation', 'bike', 'Bike', 'bicycle', 'Bicycle', 'lane', 'Sidewalk', 'Lane', 'Pedestrian', 'pedestrian', 'safety', 'bridge', 'design', 'car', 'road', 'street', 'traffic', 'avenue', 'route', 'CAR-FREE', 'streets']
+    construction_topics = ['MENTAL', 'roofing', 'inspection', 'repair', 'elevator', 'infrastructure', 'construction']
     # topics = ["Transportation", "Banking", "MENTAL", "Proposal", "Prevention", "bike", "bicycle", "lane", "pedestrian", "safety", "bridge", "design", "car", "road", "Street", "Traffic", "avenue", "route", "improve", "curb", "park", "safe", "CAR-FREE", "Streets"]
     
     cleaned_response = []
