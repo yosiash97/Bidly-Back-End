@@ -19,9 +19,9 @@ ENV NODE_ENV="production"
 # Throw-away build stage to reduce size of final image
 FROM base as build
 
-RUN apt-get update
 RUN apt-get update \
     && apt-get install -y postgresql-server-dev-all \
+                          postgis \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get install --no-install-recommends -y \
