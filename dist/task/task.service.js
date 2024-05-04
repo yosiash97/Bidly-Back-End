@@ -23,7 +23,9 @@ let TaskService = class TaskService {
         this.httpService = httpService;
         this.bidsService = bidsService;
         this.prisma = prisma;
-        this.jsonFilePath = "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
+        this.jsonFilePath = process.env.NODE_ENV === 'production'
+            ? "cities.json"
+            : "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
         this.outputData = [];
     }
     async executeGptScraper() {
@@ -111,7 +113,7 @@ let TaskService = class TaskService {
 };
 exports.TaskService = TaskService;
 __decorate([
-    (0, schedule_1.Cron)(new Date(Date.now() + 5 * 60 * 1000)),
+    (0, schedule_1.Cron)(new Date(Date.now() + 1 * 60 * 1000)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)

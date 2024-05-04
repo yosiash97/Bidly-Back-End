@@ -8,8 +8,12 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   });
-  const PORT = 3000;
+
+  const PORT = process.env.NODE_ENV === 'production'
+  ? 3000
+  : 3001;
   const HOST = '0.0.0.0';
+  app.enableCors();
   await app.listen(PORT, HOST);
 }
 bootstrap();

@@ -16,6 +16,12 @@ ENV NODE_ENV="production"
 # Throw-away build stage to reduce size of final image
 FROM base as build
 
+RUN apt-get update
+
+RUN apt-get install --no-install-recommends -y \
+    python3 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential node-gyp openssl pkg-config python-is-python3
