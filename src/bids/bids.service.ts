@@ -27,21 +27,19 @@ export class BidsService {
 
   async findBidsWithinDistance(homeLat: number, homeLong: number, sliderValue: number) {
     const radiusInMeters = sliderValue * 1609.34; // Convert miles to meters
-    const point = await this.prisma.$queryRaw`SELECT ST_MakePoint(0, 0) as point;`
-    console.log( 'point', point);
-
-    const locations = await this.prisma.$queryRaw`
-    SELECT *, ST_DistanceSphere(
-      ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
-      ST_SetSRID(ST_Point(ST_Y(ST_AsText(location::geometry)), ST_X(ST_AsText(location::geometry))), 4326)
-    ) AS distance_in_meters
-    FROM public.bid
-    WHERE ST_DistanceSphere(
-      ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
-      ST_SetSRID(ST_Point(ST_Y(ST_AsText(location::geometry)), ST_X(ST_AsText(location::geometry))), 4326)
-    ) <= ${radiusInMeters};
-  `;
   
+    const locations = await this.prisma.$queryRaw`
+      SELECT *, ST_DistanceSphere(
+        ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
+        ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
+      ) AS distance_in_meters
+      FROM public.bid
+      WHERE ST_DistanceSphere(
+        ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
+        ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
+      ) <= ${radiusInMeters};
+    `;
+    
     return locations;
   }
 
