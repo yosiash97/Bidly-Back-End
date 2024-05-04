@@ -45,6 +45,26 @@ export class BidsService {
     return locations;
   }
 
+  async findBidsbyTypeAndDistance(sliderValue: number, bid_type: string) {
+    const radiusInMeters = sliderValue * 1609.34; // Convert miles to meters
+    let homeLat = 37.3387
+    let homeLong = -121.8853
+    const locations = await this.prisma.$queryRaw`
+      SELECT *, ST_DistanceSphere(
+        ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
+        ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
+      ) AS distance_in_meters
+      FROM public.bid
+      WHERE ST_DistanceSphere(
+        ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
+        ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
+      ) <= ${radiusInMeters}
+      AND bid_type = ${bid_type};
+    `;
+    return locations;
+
+  }
+
   findOne(id: number) {
     console.log("in find one")
     return `This action returns a #${id} bid`;
