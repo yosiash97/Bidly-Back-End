@@ -25,11 +25,8 @@ RUN apt-get update \
 RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
 
 
-RUN python3 -m venv venv
-RUN /bin/bash -c "source venv/bin/activate"
-
-RUN /bin/bash -c "source venv/bin/activate && pip install --no-cache-dir geopy"
-RUN /bin/bash -c "source venv/bin/activate && pip install --no-cache-dir scrapeghost"
+RUN virtualenv virtual
+RUN /bin/bash -c "source /virtual/bin/activate && pip install geopy && && pip install scrapeghost && deactivate"
 
 RUN apt-get update \
     && apt-get install -y postgresql-server-dev-all \
