@@ -2,7 +2,7 @@
 
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=21.6.2
-FROM node:${NODE_VERSION}-slim as base
+FROM node:${NODE_VERSION} as base
 
 ARG POSTGIS_MAJOR=3
 ARG PG_MAJOR=13
@@ -18,6 +18,10 @@ ENV NODE_ENV="production"
 
 # Throw-away build stage to reduce size of final image
 FROM base as build
+RUN apt-get update \
+    && apt-get install -y sudo vim \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
 
 
@@ -26,8 +30,6 @@ RUN /bin/bash -c "source venv/bin/activate"
 
 RUN /bin/bash -c "source venv/bin/activate && pip install --no-cache-dir geopy"
 RUN /bin/bash -c "source venv/bin/activate && pip install --no-cache-dir scrapeghost"
-
-
 
 RUN apt-get update \
     && apt-get install -y postgresql-server-dev-all \
