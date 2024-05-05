@@ -2,6 +2,11 @@ import sys
 import json
 from geopy.geocoders import Nominatim
 from scrapeghost import SchemaScraper
+import logging
+
+logging.basicConfig(filename='scraper.log', level=logging.DEBUG)
+logging.debug(f"Initial Logging")
+
 
 schema = {
     "title": "string",
@@ -12,8 +17,10 @@ schema = {
 
 url = sys.argv[1]
 city = sys.argv[2]
+logging.debug(f"After SYS Args")
 # initialize Nominatim API
 geolocator = Nominatim(user_agent="bidly")
+logging.debug(f"After geologger")
 
 episode_scraper = SchemaScraper(
     schema,
@@ -23,7 +30,10 @@ episode_scraper = SchemaScraper(
     ],
 )
 
+logging.debug(f"After episode scraper")
+
 try:
+    logging.debug(f"in try")
     response = episode_scraper(url)
 
     civil_engineering_topics = ['Affordable', 'Street', 'Cannabis', 'Coding', 'Recycled','Transportation', 'bike', 'Bike', 'bicycle', 'Bicycle', 'lane', 'Sidewalk', 'Lane', 'Pedestrian', 'pedestrian', 'safety', 'bridge', 'design', 'car', 'road', 'street', 'traffic', 'avenue', 'route', 'CAR-FREE', 'streets']
@@ -31,6 +41,7 @@ try:
     # topics = ["Transportation", "Banking", "MENTAL", "Proposal", "Prevention", "bike", "bicycle", "lane", "pedestrian", "safety", "bridge", "design", "car", "road", "Street", "Traffic", "avenue", "route", "improve", "curb", "park", "safe", "CAR-FREE", "Streets"]
     
     cleaned_response = []
+    logging.debug(f"Response data: {response.data}")
     for each in response.data:
         # contains_topic = any(topic in each['title'] for topic in topics)
         contains_civil_engineering_topics = any(topic in each['title'] for topic in civil_engineering_topics)
@@ -47,6 +58,7 @@ try:
                     each['bid_type'] = "civil_engineering"
             cleaned_response.append(each)
     output_json = json.dumps(cleaned_response)
+    logging.debug(f"Output JSON: {output_json}")
     print(output_json)
 
 except Exception as e:
