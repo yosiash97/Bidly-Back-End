@@ -33,8 +33,6 @@ RUN /bin/bash -c "source /app/venv/bin/activate"
 
 RUN /app/venv/bin/python -m pip install geopy scrapeghost
 
-# Deactivate virtual environment
-RUN deactivate
 
 RUN apt-get update \
     && apt-get install -y postgresql-server-dev-all \
