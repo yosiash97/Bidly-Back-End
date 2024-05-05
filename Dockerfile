@@ -29,7 +29,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN virtualenv virtual
-RUN /bin/bash -c "source /virtual/bin/activate && pip install geopy && && pip install scrapeghost && deactivate"
+RUN /bin/bash -c "source /virtual/bin/activate && pip install geopy && pip install scrapeghost && deactivate"
 
 RUN apt-get update \
     && apt-get install -y postgresql-server-dev-all \
