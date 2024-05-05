@@ -24,6 +24,9 @@ RUN apt-get update \
 
 RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
 
+RUN apt-get update \
+    && apt-get install -y sudo vim virtualenv \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN virtualenv virtual
 RUN /bin/bash -c "source /virtual/bin/activate && pip install geopy && && pip install scrapeghost && deactivate"
