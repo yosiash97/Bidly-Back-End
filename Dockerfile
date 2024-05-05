@@ -19,6 +19,8 @@ ENV NODE_ENV="production"
 # Throw-away build stage to reduce size of final image
 FROM base as build
 
+RUN pip install --no-cache-dir geopy scrapeghost
+
 RUN apt-get update \
     && apt-get install -y postgresql-server-dev-all \
                           postgis \
