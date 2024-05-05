@@ -31,7 +31,7 @@ RUN apt-get update \
 RUN python3 -m venv /app/venv
 RUN /bin/bash -c "source /app/venv/bin/activate"
 
-RUN pip install geopy scrapeghost
+RUN /app/venv/bin/python -m pip install geopy scrapeghost
 
 # Deactivate virtual environment
 RUN deactivate
