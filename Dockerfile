@@ -28,8 +28,8 @@ RUN apt-get update \
     && apt-get install -y sudo vim virtualenv \
     && rm -rf /var/lib/apt/lists/*
 
-RUN virtualenv virtual
-RUN /bin/bash -c "source /virtual/bin/activate && pip install geopy && pip install scrapeghost && deactivate"
+RUN virtualenv /app/venv
+RUN /bin/bash -c ". /app/venv/bin/activate && pip install geopy && pip install scrapeghost && deactivate"
 
 RUN apt-get update \
     && apt-get install -y postgresql-server-dev-all \
