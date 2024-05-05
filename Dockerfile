@@ -20,6 +20,10 @@ ENV NODE_ENV="production"
 FROM base as build
 RUN apt-get update && apt-get install -y python3 python3-pip
 
+
+RUN python3 -m venv venv
+RUN /bin/bash -c "source venv/bin/activate"
+
 RUN pip install --no-cache-dir geopy
 RUN pip install --no-cache-dir scrapeghost
 
