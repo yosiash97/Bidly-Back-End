@@ -80,7 +80,7 @@ export class TaskService {
     try {
       console.log("in try");
       const escapedCity = city.replace(/ /g, '\\ '); 
-      console.log("Command -> ", `python3 scraper.py "${url}" "${escapedCity}"`);
+      console.log("Command -> ", `python3 test.py "${url}" "${escapedCity}"`);
       
       // Execute the Python script using promisified version of exec
       const { stdout, stderr } = await this.promisifyExec(`python3 ./scraper.py "${url}" "${escapedCity}"`);

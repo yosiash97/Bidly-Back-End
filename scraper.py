@@ -4,7 +4,7 @@ from geopy.geocoders import Nominatim
 from scrapeghost import SchemaScraper
 import logging
 
-logging.basicConfig(filename='scraper.log', level=logging.DEBUG)
+logging.basicConfig(filename='/app/scraper.log', level=logging.DEBUG)
 logging.debug(f"Initial Logging")
 
 
