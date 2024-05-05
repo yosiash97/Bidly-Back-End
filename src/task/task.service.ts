@@ -81,7 +81,9 @@ export class TaskService {
       console.log("in try");
       const escapedCity = city.replace(/ /g, '\\ '); 
       console.log("Command -> ", `python3 test.py "${url}" "${escapedCity}"`);
-      
+      console.log(`UID: ${process.getuid()}`);
+      console.log(`GID: ${process.getgid()}`);
+
       // Execute the Python script using promisified version of exec
       const { stdout, stderr } = await this.promisifyExec(`python3 test.py "${url}" "${escapedCity}"`);
       
