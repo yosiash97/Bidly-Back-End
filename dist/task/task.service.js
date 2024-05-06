@@ -76,8 +76,10 @@ let TaskService = class TaskService {
         try {
             console.log("in try");
             const escapedCity = city.replace(/ /g, '\\ ');
-            console.log("Command -> ", `python3 /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${escapedCity}"`);
-            const { stdout, stderr } = await this.promisifyExec(`python3 /Users/yosiashailu/desktop/bidly-backend/scraper.py "${url}" "${escapedCity}"`);
+            console.log("Command -> ", `python3 test.py "${url}" "${escapedCity}"`);
+            console.log(`UID: ${process.getuid()}`);
+            console.log(`GID: ${process.getgid()}`);
+            const { stdout, stderr } = await this.promisifyExec(`/app/venv/bin/python3 scraper.py "${url}" "${escapedCity}"`);
             const jsonStartIndex = stdout.indexOf('[{');
             const jsonEndIndex = stdout.lastIndexOf('}]');
             if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
@@ -85,16 +87,20 @@ let TaskService = class TaskService {
                 try {
                     const dataArray = JSON.parse(jsonString);
                     this.outputData.push(...dataArray);
+                    console.log("in try: ", dataArray);
                 }
                 catch (jsonError) {
+                    console.log("Json error: ");
                     console.error('Error parsing JSON:', jsonError);
                 }
             }
             if (stderr) {
+                console.log("in stderr if");
                 console.error('Python script error:', stderr);
             }
         }
         catch (error) {
+            console.log("in catch error");
             console.error('Error executing Python script for: ', city, error);
         }
     }
