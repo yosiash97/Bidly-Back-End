@@ -1,10 +1,8 @@
 {
-    "Santa Clara": "https://www.bidsync.com/bidsync-app-web/shared/shared/embeddedSearchResults.xhtml?srchoid_override=132102&curronly=1&pastonly=null",
-    "Sausalito": "https://www.sausalito.gov/departments/public-works/engineering-division/capital-improvement-projects/requests-for-proposal-rfps",
-    "South San Francisco": "https://www.ssf.net/services/rfps-and-bids",
-    "Suisun City": "https://www.suisun.com/Government/City-Clerk/Request-for-Proposal-RFPs",
-    "Union City": "https://www.unioncity.org/Bids.aspx",
-    "Vacaville": "https://www.cityofvacaville.gov/government/finance/purchasing/current-bids",
-    "Walnut Creek": "https://www.walnutcreekca.gov/business/bid-on-a-city-project"
 
+    "San Leandro": "https://www.sanleandro.org/Bids.aspx",
+    "Moraga": "https://www.moraga.ca.us/Bids.aspx",
+    "Milpitas": "https://www.milpitas.gov/264/Bid-Opportunities",
+    "Berkeley": "https://berkeleyca.gov/doing-business/working-city/bid-proposal-opportunities"
 }
+
