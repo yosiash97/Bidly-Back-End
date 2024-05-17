@@ -1,0 +1,22 @@
+name: Deploy develop branch to bidly-backend-dev on Fly.io
+
+on:
+  push:
+    branches:
+      - dev
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN}}
+
+jobs:
+  deploy:
+    name: Deploy Development App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to Fly.io
+        uses: superfly/flyctl-actions@master
+        with:
+          args: "deploy -a bidly-backend-dev --remote-only"
