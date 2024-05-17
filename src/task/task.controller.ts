@@ -17,7 +17,7 @@ export class TaskController {
 
   @Get('distance')
   async dummy(@Query('sliderValue') sliderValue: number) {
-    console.log("in slider!test!")
+    console.log("in slider!t!est!")
     let records = await this.bidService.findAll();
     const homeDistance = `POINT 37.3387 121.8853`;
     let homeLat = 37.3387
