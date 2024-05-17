@@ -11,9 +11,20 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model bid {
+  id    Int     @default(autoincrement()) @id
+  title String  @unique
+  status  String?
+  url String?
+  location String?
+  city String?
+  bid_type String?
+}
+
+model deleted_bid {
   id    Int     @default(autoincrement()) @id
   title String  @unique
   status  String?

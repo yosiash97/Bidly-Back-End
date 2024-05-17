@@ -21,6 +21,26 @@ export class BidsService {
     })
   }
 
+  // This method takes a Bid ID, deletes from main DB but adds to a soft DB
+  async deleteBid(bidID: number) {
+    // let bid = await this.prisma.bid.findUnique({
+    //   where: {
+    //     id: bidID
+    //   }
+    // })
+    // add to delete bids first then delete from main
+
+    
+    // let bidToDelete = await this.prisma.bid.delete({
+    //   where: {
+    //     id: bidID
+    //   }
+    // })
+
+
+
+  }
+
   async findAll() {
     return await this.prisma.bid.findMany();
   }
