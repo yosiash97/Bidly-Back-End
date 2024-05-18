@@ -8,6 +8,11 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   });
+  app.enableCors({
+    origin: 'https://bidly-front-end-dev.vercel.app',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  });
 
   const PORT = process.env.NODE_ENV === 'production'
   ? 3000
