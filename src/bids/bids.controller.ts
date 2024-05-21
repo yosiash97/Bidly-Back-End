@@ -14,6 +14,7 @@ export class BidsController {
 
   @Post('distance')
   delete(@Body() bidID: number) {
+    console.log("In delete distance: ", bidID)
     return this.bidsService.deleteBid(bidID);
   }
 
