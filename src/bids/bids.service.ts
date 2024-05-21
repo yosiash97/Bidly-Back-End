@@ -39,12 +39,6 @@ export class BidsService {
       },
     })
 
-    let bidToDelete = await this.prisma.bid.delete({
-      where: {
-        id: bidID
-      }
-    })
-
   }
 
   async findAll() {
