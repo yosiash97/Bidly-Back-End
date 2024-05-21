@@ -27,15 +27,19 @@ episode_scraper = SchemaScraper(
 try:
     response = episode_scraper(url)
 
-    civil_engineering_topics = ['Extension', 'Design', 'Structural', 'Roadway', 'Pavement', 'Asphalt', 'Affordable', 'Street', 'Cannabis', 'Coding', 'Recycled','Transportation', 'bike', 'Bike', 'bicycle', 'Bicycle', 'lane', 'Sidewalk', 'Lane', 'Pedestrian', 'pedestrian', 'safety', 'bridge', 'design', 'car', 'road', 'street', 'traffic', 'avenue', 'route', 'CAR-FREE', 'streets']
-    construction_topics = ['MENTAL', 'roofing', 'inspection', 'repair', 'elevator', 'infrastructure', 'construction']
+    civil_engineering_topics = ['extension', 'design', 'structural', 'roadway', 'pavement', 'asphalt', 'affordable', 'street', 'cannabis', 'coding', 'recycled', 'transportation', 'bike', 'bike', 'bicycle', 'bicycle', 'lane', 'sidewalk', 'lane', 'pedestrian', 'pedestrian', 'safety', 'bridge', 'design', 'car', 'road', 'street', 'traffic', 'avenue', 'route', 'car-free', 'streets']
+    construction_topics = ['construction', 'building', 'contractor', 'subcontractor', 'infrastructure', 'foundation', 'framework', 'materials', 'renovation', 'restoration', 'installation', 'fabrication', 'erection', 'commissioning', 'demolition', 'excavation', 'site development', 'masonry', 'plumbing', 'electrical', 'hvac', 'finishing', 'landscaping', 'project management', 'quality control', 'safety management', 'bidding', 'cost estimate', 'timeline', 'scheduling']
+    structural_topics = ['structural', 'loads', 'stress', 'design', 'reinforcement', 'concrete', 'steel', 'timber', 'composites', 'seismic', 'wind', 'foundations', 'walls', 'dynamics', 'codes', 'modeling', 'simulation', 'monitoring', 'forensics', 'failure', 'bridges', 'high-rises', 'earthquake', 'trusses', 'beams', 'columns', 'slabs', 'frames', 'walls', 'connections']
+
     # topics = ["Transportation", "Banking", "MENTAL", "Proposal", "Prevention", "bike", "bicycle", "lane", "pedestrian", "safety", "bridge", "design", "car", "road", "Street", "Traffic", "avenue", "route", "improve", "curb", "park", "safe", "CAR-FREE", "Streets"]
     
     cleaned_response = []
     for each in response.data:
         # contains_topic = any(topic in each['title'] for topic in topics)
-        contains_civil_engineering_topics = any(topic in each['title'] for topic in civil_engineering_topics)
-        contains_construction_topics = any(topic in each['title'] for topic in construction_topics)
+        title_to_check = each['title'].lower()
+        contains_civil_engineering_topics = any(topic in title_to_check for topic in civil_engineering_topics)
+        contains_construction_topics = any(topic in title_to_check for topic in construction_topics)
+        contains_structural_topics = any(topic in title_to_check for topic in structural_topics)
 
         if contains_civil_engineering_topics or contains_construction_topics:
             location = geolocator.geocode(city)
@@ -44,8 +48,11 @@ try:
                 each['city'] = city
                 if contains_construction_topics:
                     each['bid_type'] = "construction"
-                else:
+                elif contains_civil_engineering_topics:
                     each['bid_type'] = "civil_engineering"
+                else:
+                    each['bid_type'] = "structural_engineering"
+
             cleaned_response.append(each)
     output_json = json.dumps(cleaned_response)
     print(output_json)
