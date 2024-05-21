@@ -1,4 +1,4 @@
-name: Deploy main branch to bidly-backend-prod on Fly.io
+name: Deploy main branch to bidly-backend on Fly.io
 
 on:
   push:
@@ -19,4 +19,4 @@ jobs:
       - name: Deploy to Fly.io
         uses: superfly/flyctl-actions@master
         with:
-          args: "deploy -a bidly-backend-prod --remote-only"
+          args: "deploy -a bidly-backend --remote-only"
