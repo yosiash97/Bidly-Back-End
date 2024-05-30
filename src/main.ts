@@ -13,7 +13,6 @@ async function bootstrap() {
   ? 3000
   : 3001;
   const HOST = '0.0.0.0';
-  app.enableCors();
   await app.listen(PORT, HOST);
 }
 bootstrap();
