@@ -4,12 +4,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: 'https://bidly-front-end.vercel.app',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-  });
-  app.enableCors({
-    origin: 'https://bidly-front-end-dev.vercel.app',
+    origin: ['https://bidly-front-end.vercel.app', 'https://bidly-front-end-dev.vercel.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   });
