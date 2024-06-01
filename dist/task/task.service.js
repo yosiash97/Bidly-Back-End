@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TaskService = void 0;
 const common_1 = require("@nestjs/common");
-const schedule_1 = require("@nestjs/schedule");
 const child_process_1 = require("child_process");
 const fs = require("fs");
 const axios_1 = require("@nestjs/axios");
@@ -76,7 +75,7 @@ let TaskService = class TaskService {
         try {
             console.log("in try");
             const escapedCity = city.replace(/ /g, '\\ ');
-            console.log("Command -> ", `python3 test.py "${url}" "${escapedCity}"`);
+            console.log("Command -> ", `python3 scraper.py "${url}" "${escapedCity}"`);
             console.log(`UID: ${process.getuid()}`);
             console.log(`GID: ${process.getgid()}`);
             const { stdout, stderr } = await this.promisifyExec(`/app/venv/bin/python3 scraper.py "${url}" "${escapedCity}"`);
@@ -118,12 +117,6 @@ let TaskService = class TaskService {
     }
 };
 exports.TaskService = TaskService;
-__decorate([
-    (0, schedule_1.Cron)(new Date(Date.now() + 1 * 60 * 1000)),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], TaskService.prototype, "executeGptScraper", null);
 exports.TaskService = TaskService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [axios_1.HttpService,

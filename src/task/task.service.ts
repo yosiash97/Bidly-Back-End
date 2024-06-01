@@ -20,7 +20,6 @@ export class TaskService {
   : "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
   private readonly outputData: any[] = [];
 
-  @Cron(new Date(Date.now() + 1 * 60 * 1000))
   async executeGptScraper() {
     try {
       const jsonFileContent = fs.readFileSync(this.jsonFilePath, 'utf-8');
@@ -80,7 +79,7 @@ export class TaskService {
     try {
       console.log("in try");
       const escapedCity = city.replace(/ /g, '\\ '); 
-      console.log("Command -> ", `python3 test.py "${url}" "${escapedCity}"`);
+      console.log("Command -> ", `python3 scraper.py "${url}" "${escapedCity}"`);
       console.log(`UID: ${process.getuid()}`);
       console.log(`GID: ${process.getgid()}`);
 

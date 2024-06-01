@@ -24,12 +24,34 @@ let BidsService = class BidsService {
                 status: createBidDto['status'],
                 location: createBidDto['location'],
                 city: createBidDto['city'],
-                bid_type: createBidDto['bid_type']
+                bid_type: createBidDto['bid_type'],
+                deletedAt: null
             }
         });
     }
+    async deleteBid(bidID) {
+        let bid = await this.prisma.bid.findUnique({
+            where: {
+                id: bidID
+            }
+        });
+        const updateBid = await this.prisma.bid.update({
+            where: {
+                id: bidID
+            },
+            data: {
+                deletedAt: new Date(),
+            },
+        });
+    }
     async findAll() {
-        return await this.prisma.bid.findMany();
+        return await this.prisma.bid.findMany({
+            where: {
+                NOT: {
+                    deletedAt: null
+                }
+            }
+        });
     }
     async findBidsWithinDistance(homeLat, homeLong, sliderValue) {
         const radiusInMeters = sliderValue * 1609.34;
