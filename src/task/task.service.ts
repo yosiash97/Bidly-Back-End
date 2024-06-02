@@ -20,6 +20,7 @@ export class TaskService {
   : "/Users/yosiashailu/Desktop/bidly-backend/cities.json";
   private readonly outputData: any[] = [];
 
+  @Cron('0 0 * * 0')
   async executeGptScraper() {
     try {
       const jsonFileContent = fs.readFileSync(this.jsonFilePath, 'utf-8');
@@ -28,11 +29,13 @@ export class TaskService {
       const promises = [];
 
       for (let [city, url] of Object.entries(urls)) {
-        promises.push(this.scrapeLatestBids(String(url), city));
-      }
+        await this.scrapeLatestBidsWithDelay(String(url), city);      }
 
       // Wait for all promises to resolve
-      await Promise.all(promises);
+      // await Promise.all(promises);
+
+      // Wait for all promises to resolve
+      // await Promise.all(promises);
       
       await this.loadScrapedBidsIntoDB();
       console.log("Output: ", this.outputData)
@@ -44,10 +47,20 @@ export class TaskService {
     }
   }
 
+  private async scrapeLatestBidsWithDelay(url: string, city: string): Promise<void> {
+    await this.scrapeLatestBids(url, city);
+    await this.delay(30000); // 30 seconds delay
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   private async loadScrapedBidsIntoDB() {
     if (this.outputData.length == 0) {
       return;
     }
+    console.log("outputData in load scraped" , this.outputData)
     let arrayOfBids = await this.outputData
     for (let bid of arrayOfBids ) {
       const point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
@@ -75,29 +88,39 @@ export class TaskService {
   //From FE we have a coordinate X, Y and want to send request for all geocoordinates between 20 miles
 
   private async scrapeLatestBids(url: string, city: string): Promise<void> {
-    console.log("In scrape");
     try {
-      console.log("in try");
+      console.log("Beginning Scraping");
       const escapedCity = city.replace(/ /g, '\\ '); 
-      console.log("Command -> ", `python3 scraper.py "${url}" "${escapedCity}"`);
-      console.log(`UID: ${process.getuid()}`);
-      console.log(`GID: ${process.getgid()}`);
+      const pythonPath = process.env.NODE_ENV === 'production' ? '/app/venv/bin/python3' : '/Users/yosiashailu/Desktop/bidly-backend/myenv/bin/python3';
 
+      console.log(`${pythonPath} scraper.py "${url}" "${escapedCity}"`);
       // Execute the Python script using promisified version of exec
-      const { stdout, stderr } = await this.promisifyExec(`/app/venv/bin/python3 scraper.py "${url}" "${escapedCity}"`);
+      const { stdout, stderr } = await this.promisifyExec(`${pythonPath} scraper.py "${url}" "${escapedCity}"`);
       
-      const jsonStartIndex = stdout.indexOf('[{');
-      const jsonEndIndex = stdout.lastIndexOf('}]');
-      if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
-        const jsonString = stdout.substring(jsonStartIndex, jsonEndIndex + 2);
-        try {
-          const dataArray = JSON.parse(jsonString);
-          this.outputData.push(...dataArray); // Spread dataArray and push individual elements
-          console.log("in try: ", dataArray)
-        } catch (jsonError) {
-          console.log("Json error: ")
-          console.error('Error parsing JSON:', jsonError);
-        }
+      
+      console.log("stdout:", stdout);
+      console.log("stderr:", stderr);
+
+      try {
+        // Extract JSON string from stdout using regex
+        const jsonMatches = stdout.match(/\[\s*\{.*?\}\s*\]/gs);
+            
+        if (jsonMatches) {
+          const jsonString = jsonMatches[jsonMatches.length - 1];
+          try {
+              const dataArray = JSON.parse(jsonString);
+              console.log("Data Array: ", dataArray);
+              this.outputData.push(...dataArray);  // Push the parsed data into outputData array
+          } catch (jsonError) {
+              console.error("Error parsing JSON string:", jsonError);
+              console.log("Raw JSON string: ", jsonString);
+          }
+          } else {
+              throw new Error("No JSON data found in stdout");
+          }
+      } catch (jsonError) {
+          console.log("Error parsing stdout as JSON:");
+          console.error(jsonError);
       }
       if (stderr) {
         console.log("in stderr if")
