@@ -30,15 +30,8 @@ export class TaskService {
 
       for (let [city, url] of Object.entries(urls)) {
         await this.scrapeLatestBidsWithDelay(String(url), city);      }
-
-      // Wait for all promises to resolve
-      // await Promise.all(promises);
-
-      // Wait for all promises to resolve
-      // await Promise.all(promises);
       
       await this.loadScrapedBidsIntoDB();
-      console.log("Output: ", this.outputData)
 
       // After all data is collected, you can insert it into the database
       // this.insertIntoDatabase(this.outputData);
@@ -60,7 +53,6 @@ export class TaskService {
     if (this.outputData.length == 0) {
       return;
     }
-    console.log("outputData in load scraped" , this.outputData)
     let arrayOfBids = await this.outputData
     for (let bid of arrayOfBids ) {
       const point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
@@ -86,20 +78,14 @@ export class TaskService {
   }
 
   //From FE we have a coordinate X, Y and want to send request for all geocoordinates between 20 miles
-
   private async scrapeLatestBids(url: string, city: string): Promise<void> {
     try {
-      console.log("Beginning Scraping");
       const escapedCity = city.replace(/ /g, '\\ '); 
       const pythonPath = process.env.NODE_ENV === 'production' ? '/app/venv/bin/python3' : '/Users/yosiashailu/Desktop/bidly-backend/myenv/bin/python3';
 
       console.log(`${pythonPath} scraper.py "${url}" "${escapedCity}"`);
       // Execute the Python script using promisified version of exec
       const { stdout, stderr } = await this.promisifyExec(`${pythonPath} scraper.py "${url}" "${escapedCity}"`);
-      
-      
-      console.log("stdout:", stdout);
-      console.log("stderr:", stderr);
 
       try {
         // Extract JSON string from stdout using regex
@@ -109,7 +95,6 @@ export class TaskService {
           const jsonString = jsonMatches[jsonMatches.length - 1];
           try {
               const dataArray = JSON.parse(jsonString);
-              console.log("Data Array: ", dataArray);
               this.outputData.push(...dataArray);  // Push the parsed data into outputData array
           } catch (jsonError) {
               console.error("Error parsing JSON string:", jsonError);
@@ -123,11 +108,9 @@ export class TaskService {
           console.error(jsonError);
       }
       if (stderr) {
-        console.log("in stderr if")
         console.error('Python script error:', stderr);
       }
     } catch (error) {
-      console.log("in catch error")
       console.error('Error executing Python script for: ', city, error);
     }
   }

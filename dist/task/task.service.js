@@ -95,6 +95,7 @@ let TaskService = class TaskService {
                         const dataArray = JSON.parse(jsonString);
                         console.log("Data Array: ", dataArray);
                         this.outputData.push(...dataArray);
+                        console.log("After push: ", this.outputData);
                     }
                     catch (jsonError) {
                         console.error("Error parsing JSON string:", jsonError);

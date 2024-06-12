@@ -25,8 +25,8 @@ let BidsController = class BidsController {
         return this.bidsService.create(createBidDto);
     }
     delete(bidID) {
-        console.log("In delete distance: ", bidID);
-        return this.bidsService.deleteBid(bidID);
+        console.log("In delete distance: ", bidID['bidID']);
+        return this.bidsService.deleteBid(bidID['bidID']);
     }
     findAll() {
         return this.bidsService.findAll();

@@ -24,6 +24,8 @@ export class BidsService {
 
   // This method takes a Bid ID, and SOFT DELETES it by setting deleted_at to Current Time
   async deleteBid(bidID: number) {
+    console.log("Delete bid: ", bidID)
+    console.log("type: ", typeof bidID)
     let bid = await this.prisma.bid.findUnique({
       where: {
         id: bidID

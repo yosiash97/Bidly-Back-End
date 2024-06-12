@@ -22,13 +22,52 @@ schema = {
 }
 
 def parse_react_table(soup):
-    react_table = soup.select_one("div#root div.ReactTable")
+    react_table = soup.select_one("div.ReactTable")
     if not react_table:
         sys.stderr.write("ReactTable not found in the HTML\n")
         return []
 
     data = []
     rows = react_table.find_all("div", class_="rt-tr-group")
+    for row in rows:
+        row_data = []
+        cells = row.find_all("div", class_="rt-td")
+        for cell in cells:
+            cell_text = cell.get_text(strip=True)
+            row_data.append(cell_text)
+        if row_data:
+            data.append(row_data)
+
+    return data
+
+def parse_list_group(soup):
+    list_groups = soup.find_all('div', class_='listGroupWrapper clearfix')
+
+    if not list_groups:
+        sys.stderr.write("List Group Wrapper not found in the HTML\n")
+        return []
+    
+    data = []
+
+    for group in list_groups:
+        row_data = []
+        anchors = group.find_all("a", class_="mw-75 text-truncate")
+        for anchor in anchors:
+            cell_text = anchor.get_text(strip=True)
+            cell_href = anchor.get('href')
+            row_data.append({'text': cell_text, 'url': cell_href})
+        if row_data:
+            data.append(row_data)
+
+    return data
+
+def parse_planet_bids(soup):
+    rows = soup.select('tbody[role="rowgroup"] > tr')
+    if not rows:
+        sys.stderr.write("Planet Bids Table not found in the HTML\n")
+        return []
+
+    data = []
     for row in rows:
         row_data = []
         cells = row.find_all("div", class_="rt-td")
@@ -51,9 +90,18 @@ def preprocess_html(html):
 
     # Collect data from React tables
     react_table_data = parse_react_table(soup)
+    list_group_data = parse_list_group(soup)
+    planet_bids_data = parse_planet_bids(soup)
     if react_table_data:
         react_table_str = json.dumps(react_table_data, indent=4)
         new_soup.append(BeautifulSoup(f"<pre>{react_table_str}</pre>", "lxml"))
+    elif not react_table_data and list_group_data:
+        list_group_str = json.dumps(list_group_data, indent=4)
+        new_soup.append(BeautifulSoup(f"<pre>{list_group_str}</pre>", "lxml"))
+    elif not react_table_data and not list_group_data and planet_bids_data:
+        planet_bids_str = json.dumps(planet_bids_data, indent=4)
+        new_soup.append(BeautifulSoup(f"<pre>{planet_bids_str}</pre>", "lxml"))
+
 
     return str(new_soup)
 
@@ -65,20 +113,21 @@ def fetch_page_with_selenium(url):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     
     driver.get(url)
-
-    # Wait for the React table to be present
+    html = ""
     try:
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "div#root div.ReactTable"))
+        # Wait for the React table to be present
+        WebDriverWait(driver, 45).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.ReactTable div.rt-table div.rt-tbody div.rt-tr-group"))
         )
+        html = driver.page_source
+        print("ReactTable found in Selenium.")  # Debugging statement
     except Exception as e:
         sys.stderr.write("Timeout waiting for ReactTable to load\n")
-        driver.quit()
+        driver.save_screenshot("screenshot.png")  # Save a screenshot for debugging
+        html = driver.page_source  # Get the page source even if there's an error
+        sys.stderr.write(html[:5000])  # Print the first 5000 characters of the page source for debugging
     finally:
         driver.quit()
-
-    html = driver.page_source
-    driver.quit()
     
     return html
 
@@ -92,17 +141,12 @@ def main(url, city):
         except Exception as e:
             sys.stderr.write(f"Tried to scrape with selenium, no react table.... doing html scrape now.")
             response_check = requests.get(url, headers=headers)
-            print('response check status', response_check.status_code)
         
             if response_check.status_code == 200:
                 html = response_check.text
-                print("Html in if: ", html)
             print(f"HTML fetched: {len(html)} characters")
 
-        print("html outside scoep: ", html)
         cleaned_html = preprocess_html(html)
-
-
 
         geolocator = Nominatim(user_agent="bidly")
         episode_scraper = SchemaScraper(

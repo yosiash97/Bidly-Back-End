@@ -30,6 +30,8 @@ let BidsService = class BidsService {
         });
     }
     async deleteBid(bidID) {
+        console.log("Delete bid: ", bidID);
+        console.log("type: ", typeof bidID);
         let bid = await this.prisma.bid.findUnique({
             where: {
                 id: bidID
