@@ -50,6 +50,7 @@ export class TaskService {
   }
 
   private async loadScrapedBidsIntoDB() {
+    console.log("Output data: ", this.outputData)
     if (this.outputData.length == 0) {
       return;
     }
@@ -95,10 +96,16 @@ export class TaskService {
           const jsonString = jsonMatches[jsonMatches.length - 1];
           try {
               const dataArray = JSON.parse(jsonString);
+              console.log("Data Array: ", dataArray)
               this.outputData.push(...dataArray);  // Push the parsed data into outputData array
+              console.log("After push: ", this.outputData)
           } catch (jsonError) {
               console.error("Error parsing JSON string:", jsonError);
               console.log("Raw JSON string: ", jsonString);
+          }
+          if (stderr) {
+            console.log("in stderr if")
+            console.error('Python script error:', stderr);
           }
           } else {
               throw new Error("No JSON data found in stdout");

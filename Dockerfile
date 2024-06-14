@@ -4,6 +4,7 @@
 ARG NODE_VERSION=21.6.2
 FROM node:${NODE_VERSION} as base
 
+# Arguments for PostGIS and PostgreSQL
 ARG POSTGIS_MAJOR=3
 ARG PG_MAJOR=13
 
@@ -15,60 +16,69 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV="production"
 
-
 # Throw-away build stage to reduce size of final image
 FROM base as build
-RUN apt-get update \
-    && apt-get install -y sudo vim \
-    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
+# Install dependencies for building the application and Python
+RUN apt-get update && apt-get install -y \
+    sudo \
+    vim \
+    python3 \
+    python3-pip \
+    python3-venv \
+    postgresql-server-dev-all \
+    postgis \
+    build-essential \
+    node-gyp \
+    openssl \
+    pkg-config \
+    python-is-python3 && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update \
-    && apt-get install -y sudo vim virtualenv \
-    && rm -rf /var/lib/apt/lists/*
-
+# Set up virtual environment for Python
 RUN python3 -m venv /app/venv
-RUN /bin/bash -c "source /app/venv/bin/activate"
+RUN /app/venv/bin/python -m pip install --upgrade pip
 
-RUN /app/venv/bin/python -m pip install geopy scrapeghost
+# Activate the virtual environment and install Python dependencies
+RUN /bin/bash -c "source /app/venv/bin/activate && pip install geopy scrapeghost selenium beautifulsoup4 webdriver-manager requests"
 
-
-RUN apt-get update \
-    && apt-get install -y postgresql-server-dev-all \
-                          postgis \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install packages needed to build node modules
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential node-gyp openssl pkg-config python-is-python3
-
-# Install node modules
-COPY --link package-lock.json package.json ./
+# Install Node.js dependencies
+COPY package.json package-lock.json ./
 RUN npm ci --include=dev
 
 # Generate Prisma Client
-COPY --link prisma .
+COPY prisma .
 RUN npx prisma generate
 
 # Copy application code
-COPY --link . .
+COPY . .
 
 # Build application
 RUN npm run build
 
-
 # Final stage for app image
 FROM base
 
-# Install packages needed for deployment
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y openssl && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    openssl \
+    python3 \
+    python3-pip \
+    python3-venv && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy built application
+# Copy Python virtual environment from the build stage
+COPY --from=build /app/venv /app/venv
+
+# Ensure the virtual environment is activated in the final image
+ENV VIRTUAL_ENV=/app/venv
+ENV PATH="/app/venv/bin:$PATH"
+
+# Copy built application and Node.js dependencies
 COPY --from=build /app /app
 
-# Start the server by default, this can be overwritten at runtime
+# Expose the application port
 EXPOSE 3000
+
+# Start the server by default, this can be overwritten at runtime
 CMD [ "npm", "run", "start" ]

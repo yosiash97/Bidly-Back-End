@@ -120,12 +120,10 @@ def fetch_page_with_selenium(url):
             EC.presence_of_element_located((By.CSS_SELECTOR, "div.ReactTable div.rt-table div.rt-tbody div.rt-tr-group"))
         )
         html = driver.page_source
-        print("ReactTable found in Selenium.")  # Debugging statement
     except Exception as e:
         sys.stderr.write("Timeout waiting for ReactTable to load\n")
         driver.save_screenshot("screenshot.png")  # Save a screenshot for debugging
         html = driver.page_source  # Get the page source even if there's an error
-        sys.stderr.write(html[:5000])  # Print the first 5000 characters of the page source for debugging
     finally:
         driver.quit()
     
@@ -144,7 +142,6 @@ def main(url, city):
         
             if response_check.status_code == 200:
                 html = response_check.text
-            print(f"HTML fetched: {len(html)} characters")
 
         cleaned_html = preprocess_html(html)
 

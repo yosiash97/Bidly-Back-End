@@ -37,7 +37,6 @@ let TaskService = class TaskService {
                 await this.scrapeLatestBidsWithDelay(String(url), city);
             }
             await this.loadScrapedBidsIntoDB();
-            console.log("Output: ", this.outputData);
         }
         catch (error) {
             console.error('Error executing GPT scraper:', error);
@@ -51,10 +50,10 @@ let TaskService = class TaskService {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     async loadScrapedBidsIntoDB() {
+        console.log("Output data: ", this.outputData);
         if (this.outputData.length == 0) {
             return;
         }
-        console.log("outputData in load scraped", this.outputData);
         let arrayOfBids = await this.outputData;
         for (let bid of arrayOfBids) {
             const point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
@@ -80,13 +79,10 @@ let TaskService = class TaskService {
     }
     async scrapeLatestBids(url, city) {
         try {
-            console.log("Beginning Scraping");
             const escapedCity = city.replace(/ /g, '\\ ');
             const pythonPath = process.env.NODE_ENV === 'production' ? '/app/venv/bin/python3' : '/Users/yosiashailu/Desktop/bidly-backend/myenv/bin/python3';
             console.log(`${pythonPath} scraper.py "${url}" "${escapedCity}"`);
             const { stdout, stderr } = await this.promisifyExec(`${pythonPath} scraper.py "${url}" "${escapedCity}"`);
-            console.log("stdout:", stdout);
-            console.log("stderr:", stderr);
             try {
                 const jsonMatches = stdout.match(/\[\s*\{.*?\}\s*\]/gs);
                 if (jsonMatches) {
@@ -101,6 +97,10 @@ let TaskService = class TaskService {
                         console.error("Error parsing JSON string:", jsonError);
                         console.log("Raw JSON string: ", jsonString);
                     }
+                    if (stderr) {
+                        console.log("in stderr if");
+                        console.error('Python script error:', stderr);
+                    }
                 }
                 else {
                     throw new Error("No JSON data found in stdout");
@@ -111,12 +111,10 @@ let TaskService = class TaskService {
                 console.error(jsonError);
             }
             if (stderr) {
-                console.log("in stderr if");
                 console.error('Python script error:', stderr);
             }
         }
         catch (error) {
-            console.log("in catch error");
             console.error('Error executing Python script for: ', city, error);
         }
     }
