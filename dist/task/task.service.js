@@ -55,8 +55,15 @@ let TaskService = class TaskService {
             return;
         }
         let arrayOfBids = await this.outputData;
+        let point;
         for (let bid of arrayOfBids) {
-            const point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
+            console.log("Bid Geo Location: ", bid['geo_location']);
+            if (bid['geo_location']) {
+                point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
+            }
+            else {
+                point = `POINT(39.7886111 -82.6418883)`;
+            }
             try {
                 await this.bidsService.create({
                     title: bid.title,

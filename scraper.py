@@ -190,7 +190,8 @@ def main(url, city):
             contains_structural_topics = any(topic in title_to_check for topic in structural_topics)
 
             if contains_civil_engineering_topics or contains_construction_topics:
-                location = geolocator.geocode(city)
+                city_and_state = city + " CA"
+                location = geolocator.geocode(city_and_state)
                 if location:
                     each['geo_location'] = (location.latitude, location.longitude)
                     each['city'] = city
@@ -200,6 +201,8 @@ def main(url, city):
                         each['bid_type'] = "civil_engineering"
                     else:
                         each['bid_type'] = "structural_engineering"
+                if not location:
+                    each['geo_location'] = (39.7886111, -82.6418883)
 
                 cleaned_response.append(each)
 
