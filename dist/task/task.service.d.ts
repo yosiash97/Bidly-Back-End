@@ -9,6 +9,8 @@ export declare class TaskService {
     private readonly jsonFilePath;
     private readonly outputData;
     executeGptScraper(): Promise<void>;
+    private scrapeLatestBidsWithDelay;
+    private delay;
     private loadScrapedBidsIntoDB;
     private scrapeLatestBids;
     private promisifyExec;

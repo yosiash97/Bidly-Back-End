@@ -9,8 +9,13 @@ export class BidsController {
 
   @Post()
   create(@Body() createBidDto: CreateBidDto) {
-    console.log("In Post!")
     return this.bidsService.create(createBidDto);
+  }
+
+  @Post('distance')
+  delete(@Body() bidID: number) {
+    console.log("In delete distance: ", bidID['bidID'])
+    return this.bidsService.deleteBid(bidID['bidID']);
   }
 
   @Get()

@@ -16,13 +16,41 @@ export class BidsService {
         status: createBidDto['status'],
         location: createBidDto['location'],
         city: createBidDto['city'],
-        bid_type: createBidDto['bid_type']
+        bid_type: createBidDto['bid_type'],
+        deletedAt: null
       }
     })
   }
 
+  // This method takes a Bid ID, and SOFT DELETES it by setting deleted_at to Current Time
+  async deleteBid(bidID: number) {
+    console.log("Delete bid: ", bidID)
+    console.log("type: ", typeof bidID)
+    let bid = await this.prisma.bid.findUnique({
+      where: {
+        id: bidID
+      }
+    })
+
+    const updateBid = await this.prisma.bid.update({
+      where: {
+        id: bidID
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    })
+
+  }
+
   async findAll() {
-    return await this.prisma.bid.findMany();
+    return await this.prisma.bid.findMany({
+      where: {
+        NOT: {
+          deletedAt: null
+        }
+      }
+    });
   }
 
   async findBidsWithinDistance(homeLat: number, homeLong: number, sliderValue: number) {

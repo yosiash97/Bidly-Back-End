@@ -12,7 +12,9 @@ export declare class BidsController {
         location: string;
         city: string;
         bid_type: string;
+        deletedAt: Date;
     }>;
+    delete(bidID: number): Promise<void>;
     findAll(): Promise<{
         id: number;
         title: string;
@@ -21,6 +23,7 @@ export declare class BidsController {
         location: string;
         city: string;
         bid_type: string;
+        deletedAt: Date;
     }[]>;
     find(sliderValue: number, bid_type: string): Promise<unknown>;
     update(id: string, updateBidDto: UpdateBidDto): string;

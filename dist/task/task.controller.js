@@ -25,6 +25,7 @@ let TaskController = class TaskController {
         return this.taskService.executeGptScraper();
     }
     async dummy(sliderValue) {
+        console.log("Head to Delilah2");
         let records = await this.bidService.findAll();
         const homeDistance = `POINT 37.3387 121.8853`;
         let homeLat = 37.3387;

@@ -12,7 +12,9 @@ export declare class BidsService {
         location: string;
         city: string;
         bid_type: string;
+        deletedAt: Date;
     }>;
+    deleteBid(bidID: number): Promise<void>;
     findAll(): Promise<{
         id: number;
         title: string;
@@ -21,6 +23,7 @@ export declare class BidsService {
         location: string;
         city: string;
         bid_type: string;
+        deletedAt: Date;
     }[]>;
     findBidsWithinDistance(homeLat: number, homeLong: number, sliderValue: number): Promise<unknown>;
     findBidsbyTypeAndDistance(sliderValue: number, bid_type: string): Promise<unknown>;

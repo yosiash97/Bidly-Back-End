@@ -5,4 +5,5 @@ export class Bid {
     location: string;
     city: string;
     bid_type: string;
+    deleted_at: Date;
 }

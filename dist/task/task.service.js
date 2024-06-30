@@ -34,23 +34,36 @@ let TaskService = class TaskService {
             const urls = JSON.parse(jsonFileContent);
             const promises = [];
             for (let [city, url] of Object.entries(urls)) {
-                promises.push(this.scrapeLatestBids(String(url), city));
+                await this.scrapeLatestBidsWithDelay(String(url), city);
             }
-            await Promise.all(promises);
             await this.loadScrapedBidsIntoDB();
-            console.log("Output: ", this.outputData);
         }
         catch (error) {
             console.error('Error executing GPT scraper:', error);
         }
     }
+    async scrapeLatestBidsWithDelay(url, city) {
+        await this.scrapeLatestBids(url, city);
+        await this.delay(30000);
+    }
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
     async loadScrapedBidsIntoDB() {
+        console.log("Output data: ", this.outputData);
         if (this.outputData.length == 0) {
             return;
         }
         let arrayOfBids = await this.outputData;
+        let point;
         for (let bid of arrayOfBids) {
-            const point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
+            console.log("Bid Geo Location: ", bid['geo_location']);
+            if (bid['geo_location']) {
+                point = `POINT(${bid['geo_location'][0]} ${bid['geo_location'][1]})`;
+            }
+            else {
+                point = `POINT(39.7886111 -82.6418883)`;
+            }
             try {
                 await this.bidsService.create({
                     title: bid.title,
@@ -72,35 +85,43 @@ let TaskService = class TaskService {
         }
     }
     async scrapeLatestBids(url, city) {
-        console.log("In scrape");
         try {
-            console.log("in try");
             const escapedCity = city.replace(/ /g, '\\ ');
-            console.log("Command -> ", `python3 test.py "${url}" "${escapedCity}"`);
-            console.log(`UID: ${process.getuid()}`);
-            console.log(`GID: ${process.getgid()}`);
-            const { stdout, stderr } = await this.promisifyExec(`/app/venv/bin/python3 scraper.py "${url}" "${escapedCity}"`);
-            const jsonStartIndex = stdout.indexOf('[{');
-            const jsonEndIndex = stdout.lastIndexOf('}]');
-            if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
-                const jsonString = stdout.substring(jsonStartIndex, jsonEndIndex + 2);
-                try {
-                    const dataArray = JSON.parse(jsonString);
-                    this.outputData.push(...dataArray);
-                    console.log("in try: ", dataArray);
+            const pythonPath = process.env.NODE_ENV === 'production' ? '/app/venv/bin/python3' : '/Users/yosiashailu/Desktop/bidly-backend/myenv/bin/python3';
+            console.log(`${pythonPath} scraper.py "${url}" "${escapedCity}"`);
+            const { stdout, stderr } = await this.promisifyExec(`${pythonPath} scraper.py "${url}" "${escapedCity}"`);
+            try {
+                const jsonMatches = stdout.match(/\[\s*\{.*?\}\s*\]/gs);
+                if (jsonMatches) {
+                    const jsonString = jsonMatches[jsonMatches.length - 1];
+                    try {
+                        const dataArray = JSON.parse(jsonString);
+                        console.log("Data Array: ", dataArray);
+                        this.outputData.push(...dataArray);
+                        console.log("After push: ", this.outputData);
+                    }
+                    catch (jsonError) {
+                        console.error("Error parsing JSON string:", jsonError);
+                        console.log("Raw JSON string: ", jsonString);
+                    }
+                    if (stderr) {
+                        console.log("in stderr if");
+                        console.error('Python script error:', stderr);
+                    }
                 }
-                catch (jsonError) {
-                    console.log("Json error: ");
-                    console.error('Error parsing JSON:', jsonError);
+                else {
+                    throw new Error("No JSON data found in stdout");
                 }
             }
+            catch (jsonError) {
+                console.log("Error parsing stdout as JSON:");
+                console.error(jsonError);
+            }
             if (stderr) {
-                console.log("in stderr if");
                 console.error('Python script error:', stderr);
             }
         }
         catch (error) {
-            console.log("in catch error");
             console.error('Error executing Python script for: ', city, error);
         }
     }
@@ -119,7 +140,7 @@ let TaskService = class TaskService {
 };
 exports.TaskService = TaskService;
 __decorate([
-    (0, schedule_1.Cron)(new Date(Date.now() + 1 * 60 * 1000)),
+    (0, schedule_1.Cron)('0 0 * * 0'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)

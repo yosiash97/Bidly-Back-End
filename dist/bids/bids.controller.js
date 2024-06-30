@@ -22,8 +22,11 @@ let BidsController = class BidsController {
         this.bidsService = bidsService;
     }
     create(createBidDto) {
-        console.log("In Post!");
         return this.bidsService.create(createBidDto);
+    }
+    delete(bidID) {
+        console.log("In delete distance: ", bidID['bidID']);
+        return this.bidsService.deleteBid(bidID['bidID']);
     }
     findAll() {
         return this.bidsService.findAll();
@@ -46,6 +49,13 @@ __decorate([
     __metadata("design:paramtypes", [create_bid_dto_1.CreateBidDto]),
     __metadata("design:returntype", void 0)
 ], BidsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Post)('distance'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], BidsController.prototype, "delete", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
