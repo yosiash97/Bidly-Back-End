@@ -12,6 +12,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+from datetime import datetime
+from datetime import date
 
 # Schema definition
 schema = {
@@ -20,6 +22,27 @@ schema = {
     "Date": "string",
     "Status": "string",
 }
+
+def is_date_after_today(date_str):
+    date_formats = [
+        '%m-%d-%Y',
+        '%m/%d/%Y'
+    ]
+    date_obj = None
+    date_str = date_str.split(" ")[0]
+    
+    for date_format in date_formats:
+        try:
+            date_obj = datetime.strptime(date_str, date_format).date()
+            break
+        except ValueError as e:
+            continue
+
+    if date_obj is None:
+        return False  # If no format succeeded, return False
+
+    today = date.today()
+    return date_obj > today
 
 def parse_react_table(soup):
     react_table = soup.select_one("div.ReactTable")
@@ -39,6 +62,28 @@ def parse_react_table(soup):
             data.append(row_data)
 
     return data
+
+def is_date_after_today(date_str):
+    date_formats = ['%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y', '%m/%d/%Y %I:%M %p']  # Add any other date formats you want to try
+    date_obj = None
+    
+    for date_format in date_formats:
+        try:
+            date_obj = datetime.strptime(date_str, date_format)
+            break  # If parsing succeeds, exit the loop
+        except ValueError:
+            continue  # If parsing fails, try the next format
+
+    if date_obj is None:
+        return False  # If no format succeeded, return False
+
+    # Get today's date
+    today = datetime.now()
+    
+    # Check if the date is after today
+    return date_obj > today
+    
+
 
 def parse_list_group(soup):
     list_groups = soup.find_all('div', class_='listGroupWrapper clearfix')
@@ -151,7 +196,7 @@ def main(url, city):
             models=["gpt-4"],
             auto_split_length=3000,
             extra_instructions=[
-                "Include any Bid or Request for Proposal that has to do with Civil Engineering or Construction",
+                "Include any Bid or Request for Proposal that has to do with Civil Engineering or Construction, make sure the bid date/closing date/due date is after today's date. If there are two dates for the same bid choose the latest one. For the URL part, copy the link address directly from the page to construct the full URL.",
             ],
         )
 
@@ -184,30 +229,33 @@ def main(url, city):
         cleaned_response = []
         
         for each in response.data:
-            title_to_check = each['title'].lower()
-            contains_civil_engineering_topics = any(topic in title_to_check for topic in civil_engineering_topics)
-            contains_construction_topics = any(topic in title_to_check for topic in construction_topics)
-            contains_structural_topics = any(topic in title_to_check for topic in structural_topics)
+            has_date = bool(each['Date'])
 
-            if contains_civil_engineering_topics or contains_construction_topics:
-                city_and_state = city + " CA"
-                location = geolocator.geocode(city_and_state)
-                if location:
-                    each['geo_location'] = (location.latitude, location.longitude)
-                    each['city'] = city
-                    if contains_construction_topics:
-                        each['bid_type'] = "construction"
-                    elif contains_civil_engineering_topics:
-                        each['bid_type'] = "civil_engineering"
-                    else:
-                        each['bid_type'] = "structural_engineering"
-                if not location:
-                    each['geo_location'] = (39.7886111, -82.6418883)
+            if has_date and is_date_after_today(each['Date']):
+                title_to_check = each['title'].lower()
+                contains_civil_engineering_topics = any(topic in title_to_check for topic in civil_engineering_topics)
+                contains_construction_topics = any(topic in title_to_check for topic in construction_topics)
+                contains_structural_topics = any(topic in title_to_check for topic in structural_topics)
 
-                cleaned_response.append(each)
+                if contains_civil_engineering_topics or contains_construction_topics:
+                    city_and_state = city + " CA"
+                    location = geolocator.geocode(city_and_state)
+                    if location:
+                        each['geo_location'] = (location.latitude, location.longitude)
+                        each['city'] = city
+                        if contains_construction_topics:
+                            each['bid_type'] = "construction"
+                        elif contains_civil_engineering_topics:
+                            each['bid_type'] = "civil_engineering"
+                        else:
+                            each['bid_type'] = "structural_engineering"
+                    if not location:
+                        each['geo_location'] = (39.7886111, -82.6418883)
 
-        # Print only the final processed data as JSON
-        print(json.dumps(cleaned_response, indent=4))
+                    cleaned_response.append(each)
+
+            # Print only the final processed data as JSON
+            print(json.dumps(cleaned_response, indent=4))
     except Exception as e:
         sys.stderr.write(f"Couldn't scrape -> {city}\n")
         sys.stderr.write(f"Error: {e}\n")
