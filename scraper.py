@@ -230,6 +230,7 @@ def main(url, city):
         
         for each in response.data:
             has_date = bool(each['Date'])
+            has_url = bool(each['url'])
 
             if has_date and is_date_after_today(each['Date']):
                 title_to_check = each['title'].lower()
@@ -251,11 +252,13 @@ def main(url, city):
                             each['bid_type'] = "structural_engineering"
                     if not location:
                         each['geo_location'] = (39.7886111, -82.6418883)
+                    if has_url and 'www' not in url:
+                        each['url'] = url
 
                     cleaned_response.append(each)
 
             # Print only the final processed data as JSON
-            print(json.dumps(cleaned_response, indent=4))
+        print(json.dumps(cleaned_response, indent=4))
     except Exception as e:
         sys.stderr.write(f"Couldn't scrape -> {city}\n")
         sys.stderr.write(f"Error: {e}\n")
