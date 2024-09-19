@@ -13,14 +13,13 @@ const task_controller_1 = require("./task.controller");
 const axios_1 = require("@nestjs/axios");
 const bids_service_1 = require("../bids/bids.service");
 const prisma_service_1 = require("../prisma.service");
-const ip_geolocation_service_1 = require("../ip-geolocation.service");
 let TaskModule = class TaskModule {
 };
 exports.TaskModule = TaskModule;
 exports.TaskModule = TaskModule = __decorate([
     (0, common_1.Module)({
         controllers: [task_controller_1.TaskController],
-        providers: [task_service_1.TaskService, bids_service_1.BidsService, prisma_service_1.PrismaService, ip_geolocation_service_1.IpGeolocationService],
+        providers: [task_service_1.TaskService, bids_service_1.BidsService, prisma_service_1.PrismaService],
         imports: [axios_1.HttpModule]
     })
 ], TaskModule);
