@@ -49,24 +49,24 @@ let BidsService = class BidsService {
     async findAll() {
         return await this.prisma.bid.findMany({
             where: {
-                NOT: {
-                    deletedAt: null
-                }
+                deletedAt: null
             }
         });
     }
     async findBidsWithinDistance(homeLat, homeLong, sliderValue) {
         const radiusInMeters = sliderValue * 1609.34;
         const locations = await this.prisma.$queryRaw `
-      SELECT *, ST_DistanceSphere(
-        ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
-        ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
-      ) AS distance_in_meters
+      SELECT *, 
+        ST_DistanceSphere(
+          ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
+          ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
+        ) AS distance_in_meters
       FROM public.bid
-      WHERE ST_DistanceSphere(
-        ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
-        ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
-      ) <= ${radiusInMeters};
+      WHERE "deletedAt" IS NULL
+        AND ST_DistanceSphere(
+          ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
+          ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
+        ) <= ${radiusInMeters};
     `;
         return locations;
     }

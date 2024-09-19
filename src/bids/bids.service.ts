@@ -55,16 +55,19 @@ export class BidsService {
     const radiusInMeters = sliderValue * 1609.34; // Convert miles to meters
   
     const locations = await this.prisma.$queryRaw`
-      SELECT *, ST_DistanceSphere(
-        ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
-        ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
-      ) AS distance_in_meters
+      SELECT *, 
+        ST_DistanceSphere(
+          ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
+          ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
+        ) AS distance_in_meters
       FROM public.bid
-      WHERE ST_DistanceSphere(
-        ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
-        ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
-      ) <= ${radiusInMeters};
+      WHERE "deletedAt" IS NULL
+        AND ST_DistanceSphere(
+          ST_SetSRID(ST_MakePoint(${homeLong}, ${homeLat}), 4326),
+          ST_SetSRID(ST_Point(ST_Y(location::geometry), ST_X(location::geometry)), 4326)
+        ) <= ${radiusInMeters};
     `;
+  
     
     return locations;
   }

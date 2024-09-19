@@ -1,9 +1,11 @@
 import { TaskService } from './task.service';
 import { BidsService } from 'src/bids/bids.service';
+import { IpGeolocationService } from 'src/ip-geolocation.service';
 export declare class TaskController {
     private readonly taskService;
     private readonly bidService;
-    constructor(taskService: TaskService, bidService: BidsService);
+    private readonly ipGeolocationService;
+    constructor(taskService: TaskService, bidService: BidsService, ipGeolocationService: IpGeolocationService);
     findAll(): Promise<void>;
-    dummy(sliderValue: number): Promise<unknown>;
+    dummy(ipAddress: any, sliderValue: number): Promise<unknown>;
 }

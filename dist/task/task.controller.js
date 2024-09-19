@@ -16,21 +16,23 @@ exports.TaskController = void 0;
 const common_1 = require("@nestjs/common");
 const task_service_1 = require("./task.service");
 const bids_service_1 = require("../bids/bids.service");
+const ip_geolocation_service_1 = require("../ip-geolocation.service");
 let TaskController = class TaskController {
-    constructor(taskService, bidService) {
+    constructor(taskService, bidService, ipGeolocationService) {
         this.taskService = taskService;
         this.bidService = bidService;
+        this.ipGeolocationService = ipGeolocationService;
     }
     findAll() {
         return this.taskService.executeGptScraper();
     }
-    async dummy(sliderValue) {
-        console.log("Head to Delilah2");
+    async dummy(ipAddress, sliderValue) {
+        const ip = ipAddress;
         let records = await this.bidService.findAll();
-        const homeDistance = `POINT 37.3387 121.8853`;
-        let homeLat = 37.3387;
-        let homeLong = -121.8853;
-        let filtered_records = await this.bidService.findBidsWithinDistance(homeLat, homeLong, sliderValue);
+        let ip_response = this.ipGeolocationService.getGeolocation(ip);
+        let clientLat = ip_response['ll'][0];
+        let clientLong = ip_response['ll'][1];
+        let filtered_records = await this.bidService.findBidsWithinDistance(clientLat, clientLong, sliderValue);
         console.log("Filtered Records -> ", filtered_records);
         await new Promise(resolve => setTimeout(resolve, 2000));
         return filtered_records;
@@ -45,14 +47,16 @@ __decorate([
 ], TaskController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('distance'),
-    __param(0, (0, common_1.Query)('sliderValue')),
+    __param(0, (0, common_1.Ip)()),
+    __param(1, (0, common_1.Query)('sliderValue')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", Promise)
 ], TaskController.prototype, "dummy", null);
 exports.TaskController = TaskController = __decorate([
     (0, common_1.Controller)('task'),
     __metadata("design:paramtypes", [task_service_1.TaskService,
-        bids_service_1.BidsService])
+        bids_service_1.BidsService,
+        ip_geolocation_service_1.IpGeolocationService])
 ], TaskController);
 //# sourceMappingURL=task.controller.js.map

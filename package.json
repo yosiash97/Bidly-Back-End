@@ -29,8 +29,10 @@
     "@nestjs/schedule": "^4.0.1",
     "@prisma/client": "^5.11.0",
     "@vercel/postgres": "^0.8.0",
-    "axios": "^1.6.7",
+    "axios": "^1.7.3",
     "cors": "^2.8.5",
+    "geoip-lite": "^1.4.10",
+    "ip-geolocation-api-sdk-typescript": "^1.0.7",
     "python3": "^0.0.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
