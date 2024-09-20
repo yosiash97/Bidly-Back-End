@@ -46,9 +46,7 @@ export class BidsService {
   async findAll() {
     return await this.prisma.bid.findMany({
       where: {
-        NOT: {
           deletedAt: null
-        }
       }
     });
   }

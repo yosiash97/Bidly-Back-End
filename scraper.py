@@ -254,6 +254,8 @@ def main(url, city):
                         each['geo_location'] = (39.7886111, -82.6418883)
                     if has_url and 'www' not in url:
                         each['url'] = url
+                    if not has_url:
+                        each['url'] = url
 
                     cleaned_response.append(each)
 
