@@ -151,7 +151,7 @@ def main(url, city):
             models=["gpt-4"],
             auto_split_length=3000,
             extra_instructions=[
-                "Include any Bid or Request for Proposal that has to do with Civil Engineering or Construction",
+                "Include any Bid or Request for Proposal that has to do with Civil Engineering or Construction, make sure the bid date/closing date/due date is after today's date. If there are two dates for the same bid choose the latest one. For the URL part, copy the link address directly from the page to construct the full URL.",
             ],
         )
 
@@ -184,29 +184,35 @@ def main(url, city):
         cleaned_response = []
         
         for each in response.data:
-            title_to_check = each['title'].lower()
-            contains_civil_engineering_topics = any(topic in title_to_check for topic in civil_engineering_topics)
-            contains_construction_topics = any(topic in title_to_check for topic in construction_topics)
-            contains_structural_topics = any(topic in title_to_check for topic in structural_topics)
+            has_date = bool(each['Date'])
+            has_url = bool(each['url'])
 
-            if contains_civil_engineering_topics or contains_construction_topics:
-                city_and_state = city + " CA"
-                location = geolocator.geocode(city_and_state)
-                if location:
-                    each['geo_location'] = (location.latitude, location.longitude)
-                    each['city'] = city
-                    if contains_construction_topics:
-                        each['bid_type'] = "construction"
-                    elif contains_civil_engineering_topics:
-                        each['bid_type'] = "civil_engineering"
-                    else:
-                        each['bid_type'] = "structural_engineering"
-                if not location:
-                    each['geo_location'] = (39.7886111, -82.6418883)
+            if has_date and is_date_after_today(each['Date']):
+                title_to_check = each['title'].lower()
+                contains_civil_engineering_topics = any(topic in title_to_check for topic in civil_engineering_topics)
+                contains_construction_topics = any(topic in title_to_check for topic in construction_topics)
+                contains_structural_topics = any(topic in title_to_check for topic in structural_topics)
 
-                cleaned_response.append(each)
+                if contains_civil_engineering_topics or contains_construction_topics:
+                    city_and_state = city + " CA"
+                    location = geolocator.geocode(city_and_state)
+                    if location:
+                        each['geo_location'] = (location.latitude, location.longitude)
+                        each['city'] = city
+                        if contains_construction_topics:
+                            each['bid_type'] = "construction"
+                        elif contains_civil_engineering_topics:
+                            each['bid_type'] = "civil_engineering"
+                        else:
+                            each['bid_type'] = "structural_engineering"
+                    if not location:
+                        each['geo_location'] = (39.7886111, -82.6418883)
+                    if has_url and 'www' not in url:
+                        each['url'] = url
 
-        # Print only the final processed data as JSON
+                    cleaned_response.append(each)
+
+            # Print only the final processed data as JSON
         print(json.dumps(cleaned_response, indent=4))
     except Exception as e:
         sys.stderr.write(f"Couldn't scrape -> {city}\n")
